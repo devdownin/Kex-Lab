@@ -17,4 +17,9 @@ while [ "$i" -le "$COUNT" ]; do
   i=$((i + 1))
 done | "$PRODUCER" --bootstrap-server "$BROKER" --topic "$TOPIC"
 
+if [ "${KEX_LAB_INJECT_INVALID:-false}" = "true" ]; then
+  printf 'not-json-poison-message\n' | "$PRODUCER" --bootstrap-server "$BROKER" --topic "$TOPIC"
+  echo "Injected one deliberately invalid record"
+fi
+
 echo "Produced $COUNT records to $TOPIC"
