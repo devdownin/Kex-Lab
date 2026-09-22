@@ -56,7 +56,17 @@ make smoke
 
 **Individual products:** `make components` clones the upstream repositories under `.components/`. Then run `./scripts/evaluate.sh <component>`. Heavy product-specific stacks remain owned by their upstream projects instead of being copied here and drifting.
 
-See [docs/EVALUATION.md](docs/EVALUATION.md) for the evaluation paths and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for integration principles.
+See [docs/EVALUATION.md](docs/EVALUATION.md) for the evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the integrated traffic-to-diagnosis demo, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for integration principles.
+
+## End-to-end demo
+
+Add KafkaConsumerAutoTune and deterministic traffic to the core stack:
+
+```bash
+make demo
+```
+
+This produces records to `demo.app.topic`, lets AutoTune consume/adapt, exposes the same broker through Explorer, and gives Kex Agent an MCP evidence path for diagnosis. See [docs/END-TO-END.md](docs/END-TO-END.md).
 
 ## Principles
 
