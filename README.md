@@ -84,6 +84,23 @@ make demo-overload
 make report
 ```
 
+Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect.
+
+```bash
+make report
+```
+
+### 🧭 Choose a deployment profile
+
+| Goal | Command | Components |
+|---|---|---|
+| Inspect Kafka | `make profile-core` | Kafka + Explorer |
+| Add governed AI diagnosis | `make profile-ai` | Kafka + Explorer + Agent |
+| Run the complete published stack | `make profile-full` | Kafka + Explorer + Agent + AutoTune + Spectra |
+| Run the guided scenario | `make profile-demo` | Full stack + readiness + traffic + health view |
+
+The compatible image set is centralized in `versions.env`, which acts as the Lab compatibility manifest.
+
 ### 📦 Prefer a smaller starting point?
 
 For Kafka + Explorer + Kex Agent:
