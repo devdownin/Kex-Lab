@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 COMPOSE := docker compose -f compose.yml
 
-.PHONY: setup up down reset status smoke logs components evaluate
+.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -30,3 +30,12 @@ components:
 
 evaluate:
 	sh scripts/evaluate.sh all
+
+demo: setup
+	sh scripts/demo.sh
+
+traffic: setup
+	docker compose -f compose.yml -f compose.autotune.yml run --rm traffic
+
+demo-down:
+	docker compose -f compose.yml -f compose.autotune.yml down
