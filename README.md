@@ -89,6 +89,31 @@ make observability-up
 
 Image versions are centralized in `versions.env`. Integration boundaries are documented in [docs/CONTRACTS.md](docs/CONTRACTS.md). The evidence checklist is in [docs/SCORECARD.md](docs/SCORECARD.md).
 
+## Docker Hub-only profile
+
+Run all four Kex applications from their published images, without cloning or building application sources:
+
+```bash
+cp .env.example .env
+make doctor
+make hub-up
+make hub-status
+```
+
+The profile pulls Kafka Explorer, Kex Agent AI, KafkaConsumerAutoTune, SpectraLLM and the Spectra frontend from the image catalog in `versions.env`. Spectra is connected to the same Kafka broker and subscribes to `demo.app.topic`.
+
+Endpoints:
+
+- Explorer: http://localhost:8080
+- Kex Agent: http://localhost:8081
+- AutoTune: http://localhost:8082/dashboard
+- Spectra: http://localhost:8084
+- Spectra API: http://localhost:8083
+
+Spectra still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup; this is independent from building the application images.
+
+Stop with `make hub-down`.
+
 ## Principles
 
 - Published images first for fast evaluation.
