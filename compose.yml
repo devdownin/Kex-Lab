@@ -31,6 +31,23 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+  kafka-init:
+    image: ${KAFKA_IMAGE:-apache/kafka:4.3.1}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./scripts/kafka-init.sh:/opt/kex-lab/kafka-init.sh:ro
+    entrypoint: ["sh", "/opt/kex-lab/kafka-init.sh"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KEX_LAB_TOPIC: ${KEX_LAB_TOPIC:-demo.app.topic}
+      KEX_LAB_DLT_TOPIC: ${KEX_LAB_DLT_TOPIC:-demo.app.topic.dlt}
+      KEX_LAB_PARTITIONS: ${KEX_LAB_PARTITIONS:-6}
+      KEX_LAB_MESSAGES: ${KEX_LAB_MESSAGES:-500}
+      KEX_LAB_INJECT_INVALID: ${KEX_LAB_INJECT_INVALID:-false}
+    restart: "no"
+
   explorer:
     image: ${EXPLORER_IMAGE:-compagnonsdudev/kafkaexplorer:latest}
     ports:
@@ -42,8 +59,8 @@ services:
       EXPLORER_MCP_REQUIRE_TLS: "false"
       EXPLORER_MCP_AUTH_TOKEN: ${EXPLORER_MCP_AUTH_TOKEN}
     depends_on:
-      kafka:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/actuator/health/liveness | grep -q '\"status\":\"UP\"'"]
       interval: 15s
