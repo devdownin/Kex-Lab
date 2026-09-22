@@ -1,0 +1,27 @@
+services:
+  autotune:
+    image: ${AUTOTUNE_IMAGE:-devdownin/kafkaconsumerautotune:latest}
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${AUTOTUNE_PORT:-8082}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    entrypoint: ["java", "-jar", "app.jar"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  traffic:
+    image: ${KAFKA_IMAGE:-apache/kafka:4.3.1}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./scenarios/end-to-end/produce.sh:/opt/kex-lab/produce.sh:ro
+    entrypoint: ["sh", "/opt/kex-lab/produce.sh"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KEX_LAB_TOPIC: demo.app.topic
+      KEX_LAB_MESSAGES: ${KEX_LAB_MESSAGES:-500}
+      KEX_LAB_INJECT_INVALID: ${KEX_LAB_INJECT_INVALID:-false}
