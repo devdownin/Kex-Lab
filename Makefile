@@ -17,16 +17,16 @@ reset:
 	$(COMPOSE) down -v --remove-orphans
 
 status:
-	./scripts/status.sh
+	sh scripts/status.sh
 
 smoke:
-	./scripts/smoke-test.sh
+	sh scripts/smoke-test.sh
 
 logs:
 	$(COMPOSE) logs -f
 
 components:
-	./scripts/components.sh
+	sh scripts/components.sh
 
 evaluate:
-	./scripts/evaluate.sh all
+	sh scripts/evaluate.sh all
