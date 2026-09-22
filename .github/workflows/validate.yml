@@ -1,0 +1,25 @@
+name: Validate Lab
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose
+        env:
+          EXPLORER_MCP_AUTH_TOKEN: ci-mcp-token
+          KEX_AGENT_API_KEY: ci-agent-key
+        run: docker compose -f compose.yml config -q
+      - name: Validate shell scripts
+        run: |
+          for script in scripts/*.sh; do
+            sh -n "$script"
+          done
