@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 COMPOSE := docker compose --env-file versions.env -f compose.yml
 
-.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-full profile-demo integration-smoke
+.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-full profile-demo integration-smoke scenario-assert agent-e2e
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -95,3 +95,9 @@ profile-demo: demo
 
 integration-smoke: setup
 	sh scripts/integration-smoke.sh
+
+scenario-assert: setup
+	sh scripts/scenario-assert.sh ${SCENARIO:-basic}
+
+agent-e2e: setup
+	sh scripts/agent-e2e.sh
