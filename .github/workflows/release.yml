@@ -1,0 +1,46 @@
+name: Release Kex Lab
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate compatibility manifest
+        run: |
+          test -s versions.env
+          grep -q '^KEX_LAB_MANIFEST_VERSION=' versions.env
+          grep -q '^EXPLORER_IMAGE=' versions.env
+          grep -q '^KEX_AGENT_IMAGE=' versions.env
+          grep -q '^AUTOTUNE_IMAGE=' versions.env
+          grep -q '^SPECTRALLM_IMAGE=' versions.env
+          grep -q '^SPECTRALLM_FRONTEND_IMAGE=' versions.env
+
+      - name: Build release notes
+        run: |
+          {
+            echo "## Kex Lab compatibility bundle"
+            echo
+            echo 'The exact image references validated for this Lab release are:'
+            echo
+            echo '~~~text'
+            cat versions.env
+            echo '~~~'
+            echo
+            echo "See CHANGELOG.md for Lab-level changes and each component repository for component-specific changes."
+          } > release-notes.md
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" --title "Kex Lab ${GITHUB_REF_NAME}" --notes-file release-notes.md

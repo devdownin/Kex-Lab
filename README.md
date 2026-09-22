@@ -55,9 +55,7 @@ No application source build is required. Kex Lab uses the published Docker Hub i
 
 ```bash
 cp .env.example .env
-make doctor
-make hub-up
-make hub-status
+make demo
 ```
 
 Open:
@@ -69,15 +67,15 @@ Open:
 
 SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup. Kex Agent chat requires a configured model provider/API key.
 
-Stop the complete stack with `make hub-down`.
+`make demo` checks the local prerequisites, starts the published stack, waits for readiness, injects the basic Kafka scenario, prints the health dashboard and the application URLs. Stop the complete stack with `make hub-down`.
 
-### ⚡ See the Kafka scenario in action
+### ⚡ Reproduce operational scenarios
 
 ```bash
 make demo-basic
 ```
 
-Additional reproducible scenarios:
+The one-command demo runs the basic scenario. To deliberately create more visible operating conditions:
 
 ```bash
 make demo-lag
@@ -85,6 +83,23 @@ make demo-dlt
 make demo-overload
 make report
 ```
+
+Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect.
+
+```bash
+make report
+```
+
+### 🧭 Choose a deployment profile
+
+| Goal | Command | Components |
+|---|---|---|
+| Inspect Kafka | `make profile-core` | Kafka + Explorer |
+| Add governed AI diagnosis | `make profile-ai` | Kafka + Explorer + Agent |
+| Run the complete published stack | `make profile-full` | Kafka + Explorer + Agent + AutoTune + Spectra |
+| Run the guided scenario | `make profile-demo` | Full stack + readiness + traffic + health view |
+
+The compatible image set is centralized in `versions.env`, which acts as the Lab compatibility manifest.
 
 ### 📦 Prefer a smaller starting point?
 
@@ -113,13 +128,16 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 
 ```mermaid
 flowchart LR
-  K[(Kafka 4.3)] --> E[Kafka SQL Explorer]
-  K --> T[KafkaConsumerAutoTune]
-  E -->|MCP / read-only tools| A[Kex Agent AI]
-  S[SpectraLLM] -. private LLM / knowledge .-> E
-  S -. local AI .-> A
+  P[Demo producer] -->|records| K[(Kafka 4.3)]
+  K -->|topics / records| E[Kafka SQL Explorer]
+  K -->|consumer workload| T[KafkaConsumerAutoTune]
+  E -->|read-only MCP tools| A[Kex Agent AI]
+  A -->|optional local inference| S[SpectraLLM]
+  S -->|optional Kafka ingestion| K
   T -. consumer state / metrics .-> K
 ```
+
+**Runtime boundaries:** Kafka is the shared event backbone; Explorer owns inspection and the read-only MCP evidence boundary; AutoTune consumes Kafka traffic and adapts its consumer settings; Kex Agent reasons over governed MCP evidence rather than receiving Kafka mutation rights; Spectra is optional local inference/knowledge infrastructure. See [the detailed architecture](docs/ARCHITECTURE.md).
 
 ## 📊 Evaluate with evidence
 
@@ -128,12 +146,21 @@ Individual products can also be evaluated from their upstream repositories. `mak
 For the integrated Lab, optional cross-project observability is available with:
 
 ```bash
+make health
+# Service state, image/version and URL
+
 make observability-up
 # Prometheus: http://localhost:9090
 # Grafana:    http://localhost:3000
 ```
 
 Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
+
+## 🏷️ Releases
+
+Kex Lab versions the **integration bundle**, independently from the component release cycles. A tag such as `v1.0.0` identifies a tested Lab configuration; `versions.env` records the component image references included in that bundle.
+
+Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the manifest and creates GitHub release notes containing the exact image set. Lab-level changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## 🔒 Principles
 
@@ -153,6 +180,8 @@ Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/
 ├── Makefile
 ├── scripts/
 │   ├── components.sh
+│   ├── quick-demo.sh
+│   ├── health.sh
 │   ├── status.sh
 │   ├── smoke-test.sh
 │   └── evaluate.sh
