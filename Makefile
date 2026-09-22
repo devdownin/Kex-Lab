@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 COMPOSE := docker compose --env-file versions.env -f compose.yml
 
-.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report observability-up observability-down demo-basic demo-lag demo-dlt demo-overload
+.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -43,6 +43,9 @@ demo-down:
 doctor:
 	sh scripts/doctor.sh
 
+wait:
+	sh scripts/wait-ready.sh
+
 report:
 	sh scripts/report.sh
 
@@ -63,3 +66,15 @@ observability-up: setup
 
 observability-down:
 	docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml -f compose.observability.yml down
+
+hub-pull:
+	sh scripts/hub.sh pull
+
+hub-up: setup
+	sh scripts/hub.sh up
+
+hub-down:
+	sh scripts/hub.sh down
+
+hub-status:
+	sh scripts/hub.sh ps
