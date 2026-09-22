@@ -4,14 +4,14 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 TARGET="${1:-all}"
 
 ensure_components() {
-  [ -d "$ROOT/.components/Kafkaexplorer" ] || "$ROOT/scripts/components.sh"
+  [ -d "$ROOT/.components/Kafkaexplorer" ] || sh "$ROOT/scripts/components.sh"
 }
 
 case "$TARGET" in
   core)
     cd "$ROOT"
     docker compose -f compose.yml up -d
-    "$ROOT/scripts/smoke-test.sh"
+    sh "$ROOT/scripts/smoke-test.sh"
     ;;
   explorer)
     ensure_components
@@ -28,7 +28,7 @@ case "$TARGET" in
   spectra)
     ensure_components
     cd "$ROOT/.components/SpectraLLM"
-    ./scripts/start.sh --first-run --hub
+    sh ./scripts/start.sh --first-run --hub
     ;;
   agent)
     ensure_components
