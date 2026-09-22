@@ -156,6 +156,12 @@ make observability-up
 
 Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
 
+## 🏷️ Releases
+
+Kex Lab versions the **integration bundle**, independently from the component release cycles. A tag such as `v1.0.0` identifies a tested Lab configuration; `versions.env` records the component image references included in that bundle.
+
+Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the manifest and creates GitHub release notes containing the exact image set. Lab-level changes are tracked in [CHANGELOG.md](CHANGELOG.md).
+
 ## 🔒 Principles
 
 - Published images first for fast evaluation.
