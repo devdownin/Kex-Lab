@@ -67,7 +67,21 @@ Open:
 
 SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup. Kex Agent chat requires a configured model provider/API key.
 
-`make demo` checks the local prerequisites, starts the published stack, waits for readiness, injects the basic Kafka scenario, prints the health dashboard and the application URLs. Stop the complete stack with `make hub-down`.
+Kafka initialization is part of the Compose lifecycle: the one-shot `kafka-init` service waits for Kafka, creates the configured application and DLT topics, then seeds the application topic before dependent services start. `make demo` checks prerequisites, starts the published stack, waits for readiness, runs the basic scenario, prints the health dashboard and the application URLs. Stop the complete stack with `make hub-down`.
+
+### 🌱 Kafka initialization
+
+The Compose stack automatically runs `scripts/kafka-init.sh`. Topic creation is idempotent (`--if-not-exists`); seed records are produced each time the initializer runs.
+
+| Setting | Default | Purpose |
+|---|---|---|
+| `KEX_LAB_TOPIC` | `demo.app.topic` | Application topic |
+| `KEX_LAB_DLT_TOPIC` | `demo.app.topic.dlt` | Dead-letter topic |
+| `KEX_LAB_PARTITIONS` | `6` | Partitions created for both topics |
+| `KEX_LAB_MESSAGES` | `500` | Seed records written to the application topic |
+| `KEX_LAB_INJECT_INVALID` | `false` | Optionally adds the poison record used by the DLT scenario |
+
+Explorer, AutoTune and Spectra wait for successful initialization where their Compose profile requires Kafka data. The existing `traffic` service reuses the same initializer, so topic creation and sample generation have one implementation.
 
 ### ⚡ Reproduce operational scenarios
 
@@ -128,7 +142,7 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 
 ```mermaid
 flowchart LR
-  P[Demo producer] -->|records| K[(Kafka 4.3)]
+  K[(Kafka 4.3)] --> I[kafka-init]\n  I -->|create topics + seed records| K
   K -->|topics / records| E[Kafka SQL Explorer]
   K -->|consumer workload| T[KafkaConsumerAutoTune]
   E -->|read-only MCP tools| A[Kex Agent AI]
@@ -181,7 +195,7 @@ Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the man
 ├── Makefile
 ├── scripts/
 │   ├── components.sh
-│   ├── quick-demo.sh
+│   ├── kafka-init.sh\n│   ├── quick-demo.sh
 │   ├── health.sh
 │   ├── status.sh
 │   ├── smoke-test.sh
