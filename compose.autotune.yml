@@ -1,6 +1,6 @@
 services:
   autotune:
-    image: devdownin/kafkaconsumerautotune:latest
+    image: ${AUTOTUNE_IMAGE:-devdownin/kafkaconsumerautotune:latest}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${AUTOTUNE_PORT:-8082}:8080"
     environment:
@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
 
   traffic:
-    image: apache/kafka:4.3.1
+    image: ${KAFKA_IMAGE:-apache/kafka:4.3.1}
     depends_on:
       kafka:
         condition: service_healthy
@@ -24,3 +24,4 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       KEX_LAB_TOPIC: demo.app.topic
       KEX_LAB_MESSAGES: ${KEX_LAB_MESSAGES:-500}
+      KEX_LAB_INJECT_INVALID: ${KEX_LAB_INJECT_INVALID:-false}
