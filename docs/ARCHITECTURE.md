@@ -8,7 +8,7 @@ Kex Lab is an integration boundary, not a monorepo. Each product remains indepen
 
 ```mermaid
 flowchart LR
-    P[Scenario producer] -->|demo.app.topic| K[(Kafka 4.3)]
+    K[(Kafka 4.3)] --> I[kafka-init one-shot]\n    I -->|create topics + seed records| K
     K -->|bootstrap kafka:29092| E[Kafka SQL Explorer]
     K -->|consumer workload| T[KafkaConsumerAutoTune]
     E -->|read-only MCP tools| A[Kex Agent AI]
@@ -20,7 +20,7 @@ flowchart LR
 
 | Boundary | Contract |
 |---|---|
-| Scenario → Kafka | Deterministic records injected by the Lab scenarios |
+| kafka-init → Kafka | Creates the application/DLT topics and injects deterministic seed records before dependent services start |
 | Explorer → Kafka | Inspection/query access to the shared broker |
 | AutoTune → Kafka | Consumer workload and consumer-group state |
 | Agent → Explorer | Read-only MCP tools; Kafka evidence remains bounded by Explorer |
@@ -54,6 +54,14 @@ sequenceDiagram
     E-->>A: bounded result
     A-->>U: assisted diagnosis + tool trace
 ```
+
+## Kafka initialization lifecycle
+
+`kafka-init` is a one-shot service built from the same Kafka image as the broker tooling. It starts only after Kafka is healthy, mounts `scripts/kafka-init.sh`, creates `KEX_LAB_TOPIC` and `KEX_LAB_DLT_TOPIC` with `--if-not-exists`, and writes `KEX_LAB_MESSAGES` deterministic records.
+
+Topic creation is idempotent. Data seeding is intentionally repeatable: rerunning the initializer adds another configured batch rather than deleting existing data. Explorer and other Kafka-dependent services use `service_completed_successfully` where initialization must precede startup.
+
+The same script is reused by the `traffic` service and the backward-compatible end-to-end producer entrypoint, preventing separate topic/seed implementations from drifting.
 
 ## Demo path
 

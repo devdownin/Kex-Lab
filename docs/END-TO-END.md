@@ -25,7 +25,7 @@ Configure `.env`, including an LLM key if you want the Agent reasoning step, the
 make demo
 ```
 
-The demo adds AutoTune to the lightweight core stack and produces 500 deterministic JSON records to `demo.app.topic`.
+Compose first runs the one-shot `kafka-init` service. It creates `demo.app.topic` and `demo.app.topic.dlt` (six partitions by default) and seeds `demo.app.topic` with 500 deterministic JSON records by default. Kafka-dependent services then start after successful initialization. Values can be changed through `KEX_LAB_TOPIC`, `KEX_LAB_DLT_TOPIC`, `KEX_LAB_PARTITIONS` and `KEX_LAB_MESSAGES`.
 
 AutoTune is launched with its `dev` profile and H2 persistence, so the Lab does not require the Oracle XE stack merely to demonstrate Kafka consumption and tuning. Its image normally waits for Oracle in its entrypoint; the Lab overrides that entrypoint for this H2 evaluation profile.
 
@@ -51,7 +51,7 @@ The expected proof is a chain of evidence rather than a predetermined prose answ
 KEX_LAB_MESSAGES=5000 make traffic
 ```
 
-This gives the optimizer a larger backlog to work through. Compare consumer lag in Explorer with throughput and tuning interventions in AutoTune.
+The `traffic` service uses the same `scripts/kafka-init.sh` implementation as Compose startup, so this adds another 5,000 deterministic records without maintaining a separate producer path. This gives the optimizer a larger backlog to work through. Compare consumer lag in Explorer with throughput and tuning interventions in AutoTune.
 
 ## SpectraLLM
 
