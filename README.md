@@ -84,7 +84,7 @@ make demo-overload
 make report
 ```
 
-Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect.
+Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect. Run `SCENARIO=lag make scenario-assert` to execute a scenario with machine-checkable assertions. `make agent-e2e` additionally exercises the Agent → Explorer MCP diagnosis when a model provider and a stable Agent chat endpoint are configured.
 
 ```bash
 make report
@@ -152,6 +152,7 @@ make health
 make observability-up
 # Prometheus: http://localhost:9090
 # Grafana:    http://localhost:3000
+# Dashboard:  Kex Lab / Kex Lab — Integrated Operations
 ```
 
 Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
