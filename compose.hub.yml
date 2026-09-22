@@ -1,0 +1,40 @@
+# Kex Lab — Docker Hub-only application profile.
+# All four Kex applications are pulled as published images; no application source build.
+services:
+  spectra-chromadb:
+    image: chromadb/chroma:${CHROMADB_IMAGE_TAG:-1.5.9}
+    volumes:
+      - spectra_chroma:/data
+    restart: unless-stopped
+
+  spectra-api:
+    image: ${SPECTRALLM_IMAGE:-compagnonsdudev/spectrallm:latest}
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${SPECTRA_API_PORT:-8083}:8080"
+    environment:
+      SPECTRA_CHROMADB_BASE_URL: http://spectra-chromadb:8000
+      SPECTRA_KAFKA_ENABLED: "true"
+      SPECTRA_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPECTRA_KAFKA_TOPICS: ${SPECTRA_KAFKA_TOPICS:-demo.app.topic}
+      SPECTRA_KAFKA_GROUP_ID: ${SPECTRA_KAFKA_GROUP_ID:-spectra-ingestion}
+      SPECTRA_STARTUP_AUTO_INSTALL_MODELS: "${SPECTRA_STARTUP_AUTO_INSTALL_MODELS:-true}"
+    volumes:
+      - spectra_data:/app/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+      spectra-chromadb:
+        condition: service_started
+    restart: unless-stopped
+
+  spectra-frontend:
+    image: ${SPECTRALLM_FRONTEND_IMAGE:-compagnonsdudev/spectrallm-frontend:latest}
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${SPECTRA_FRONTEND_PORT:-8084}:80"
+    depends_on:
+      - spectra-api
+    restart: unless-stopped
+
+volumes:
+  spectra_chroma:
+  spectra_data:
