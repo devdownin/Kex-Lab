@@ -1,0 +1,36 @@
+name: Fresh Clone Smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fresh-clone:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure clean environment
+        run: cp .env.example .env
+      - name: Doctor
+        run: make doctor
+      - name: Start core
+        run: make up
+      - name: Wait and smoke
+        run: |
+          for i in $(seq 1 30); do
+            if make smoke; then exit 0; fi
+            sleep 10
+          done
+          docker compose --env-file versions.env -f compose.yml ps
+          docker compose --env-file versions.env -f compose.yml logs --no-color
+          exit 1
+      - name: Generate report
+        if: always()
+        run: make report
+      - name: Shutdown
+        if: always()
+        run: make reset
