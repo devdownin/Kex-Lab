@@ -1,17 +1,85 @@
 # Kex Lab
 
-**One lab to understand, run and evaluate the Kex ecosystem.**
+**Run and evaluate an AI-assisted Kafka operations stack on your machine.**
 
-Kex Lab is the integration and evaluation repository for four complementary projects:
+Kex Lab connects four open-source projects around one Kafka broker so developers and platform teams can evaluate Kafka inspection, adaptive consumption, AI-assisted diagnosis and optional local AI capabilities in one reproducible environment.
 
-| Project | Role |
+```mermaid
+flowchart LR
+  P[Produce Kafka traffic] --> K[(Kafka)]
+  K --> T[KafkaConsumerAutoTune]
+  K --> E[Kafka SQL Explorer]
+  E -->|read-only MCP| A[Kex Agent AI]
+  S[SpectraLLM] -. optional local AI / knowledge .-> A
+```
+
+The integrated demo produces Kafka traffic, lets **KafkaConsumerAutoTune** consume and adapt, exposes the broker through **Kafka SQL Explorer**, and gives **Kex Agent AI** a read-only MCP path for assisted diagnosis. **SpectraLLM** adds optional local AI and knowledge capabilities.
+
+Kex Lab is an integration and evaluation repository. The four products remain independent projects.
+
+## Start here
+
+Requirements: Docker Engine with Compose v2.
+
+### Evaluate the complete published stack
+
+No application source build is required. Kex Lab uses the published Docker Hub images for the four projects (five application images because SpectraLLM has separate backend and frontend images).
+
+```bash
+cp .env.example .env
+make doctor
+make hub-up
+make hub-status
+```
+
+Open:
+
+- Kafka SQL Explorer: **http://localhost:8080**
+- Kex Agent AI: **http://localhost:8081**
+- KafkaConsumerAutoTune: **http://localhost:8082/dashboard**
+- SpectraLLM: **http://localhost:8084**
+
+SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup. Kex Agent chat requires a configured model provider/API key.
+
+Stop the complete stack with `make hub-down`.
+
+### Run the Kafka diagnosis scenario
+
+```bash
+make demo-basic
+```
+
+Additional reproducible scenarios:
+
+```bash
+make demo-lag
+make demo-dlt
+make demo-overload
+make report
+```
+
+### Evaluate only the core
+
+For Kafka + Explorer + Kex Agent:
+
+```bash
+cp .env.example .env
+make doctor
+make up
+make status
+make smoke
+```
+
+Stop with `make down`, or use `make reset` to also remove volumes.
+
+## Components
+
+| Project | What it contributes to the Lab |
 |---|---|
-| [Kex Agent AI](https://github.com/devdownin/Kex-agent-ai) | Governed AI agent, MCP orchestration, supervision and human approval |
-| [Kafka SQL Explorer](https://github.com/devdownin/Kafkaexplorer) | Inspect, query, trace and audit Kafka; exposes read-only MCP tools |
-| [KafkaConsumerAutoTune](https://github.com/devdownin/kafkaconsumerautotune) | Adaptive Kafka consumer using PID-based tuning, resilience and observability |
-| [SpectraLLM](https://github.com/devdownin/SpectraLLM) | Private local RAG, document ingestion, fine-tuning and local LLM serving |
-
-Kex Lab does not merge those products. It provides the glue needed to evaluate them together and independently.
+| [Kex Agent AI](https://github.com/devdownin/Kex-agent-ai) | Uses governed actions, supervision and human approval; accesses Kafka evidence through Explorer's MCP tools |
+| [Kafka SQL Explorer](https://github.com/devdownin/Kafkaexplorer) | Inspects, queries, traces and audits Kafka; exposes read-only MCP tools |
+| [KafkaConsumerAutoTune](https://github.com/devdownin/kafkaconsumerautotune) | Consumes Kafka traffic and adapts consumer settings using PID-based tuning, with resilience and observability |
+| [SpectraLLM](https://github.com/devdownin/SpectraLLM) | Provides optional private local RAG, document ingestion, fine-tuning and local LLM serving |
 
 ## Architecture
 
@@ -25,61 +93,11 @@ flowchart LR
   T -. consumer state / metrics .-> K
 ```
 
-## 5-minute start
+## Evaluation and observability
 
-Requirements: Docker Engine with Compose v2.
+Individual products can also be evaluated from their upstream repositories. `make components` clones them under `.components/`; then run `sh scripts/evaluate.sh <component>`.
 
-```bash
-cp .env.example .env
-make doctor
-make up
-make status
-make smoke
-```
-
-Open Kafka SQL Explorer at **http://localhost:8080** and Kex Agent AI at **http://localhost:8081**.
-
-Set a model API key in `.env` before using agent chat. Infrastructure and Explorer can be evaluated without one.
-
-```bash
-make down
-make reset   # also removes volumes
-```
-
-## Evaluation paths
-
-**Core (recommended first):** one Kafka broker + Explorer + Kex Agent, wired through MCP.
-
-```bash
-make up
-make smoke
-```
-
-**Individual products:** `make components` clones the upstream repositories under `.components/`. Then run `./scripts/evaluate.sh <component>`. Heavy product-specific stacks remain owned by their upstream projects instead of being copied here and drifting.
-
-See [docs/EVALUATION.md](docs/EVALUATION.md) for the evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the integrated traffic-to-diagnosis demo, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for integration principles.
-
-## End-to-end demo
-
-Add KafkaConsumerAutoTune and deterministic traffic to the core stack:
-
-```bash
-make demo
-```
-
-This produces records to `demo.app.topic`, lets AutoTune consume/adapt, exposes the same broker through Explorer, and gives Kex Agent an MCP evidence path for diagnosis. See [docs/END-TO-END.md](docs/END-TO-END.md).
-
-Reproducible scenarios:
-
-```bash
-make demo-basic
-make demo-lag
-make demo-dlt
-make demo-overload
-make report
-```
-
-Optional cross-project observability:
+For the integrated Lab, optional cross-project observability is available with:
 
 ```bash
 make observability-up
@@ -87,32 +105,7 @@ make observability-up
 # Grafana:    http://localhost:3000
 ```
 
-Image versions are centralized in `versions.env`. Integration boundaries are documented in [docs/CONTRACTS.md](docs/CONTRACTS.md). The evidence checklist is in [docs/SCORECARD.md](docs/SCORECARD.md).
-
-## Docker Hub-only profile
-
-Run all four Kex applications from their published images, without cloning or building application sources:
-
-```bash
-cp .env.example .env
-make doctor
-make hub-up
-make hub-status
-```
-
-The profile pulls Kafka Explorer, Kex Agent AI, KafkaConsumerAutoTune, SpectraLLM and the Spectra frontend from the image catalog in `versions.env`. Spectra is connected to the same Kafka broker and subscribes to `demo.app.topic`.
-
-Endpoints:
-
-- Explorer: http://localhost:8080
-- Kex Agent: http://localhost:8081
-- AutoTune: http://localhost:8082/dashboard
-- Spectra: http://localhost:8084
-- Spectra API: http://localhost:8083
-
-Spectra still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup; this is independent from building the application images.
-
-Stop with `make hub-down`.
+Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
 
 ## Principles
 
