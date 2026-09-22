@@ -1,6 +1,21 @@
+<div align="center">
+
 # Kex Lab
 
-**Run and evaluate an AI-assisted Kafka operations stack on your machine.**
+### AI-assisted Kafka operations — observable, adaptive, local.
+
+**Run and evaluate the complete Kex stack on your machine.**
+
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Kafka](https://img.shields.io/badge/Apache-Kafka-231F20?logo=apachekafka&logoColor=white)](https://kafka.apache.org/)
+[![MCP](https://img.shields.io/badge/MCP-read--only-5C5C5C)](https://modelcontextprotocol.io/)
+[![GitHub](https://img.shields.io/badge/source-open-181717?logo=github)](https://github.com/devdownin/Kex-Lab)
+
+**Observe Kafka · Adapt consumers · Diagnose with AI · Keep knowledge local**
+
+</div>
+
+---
 
 Kex Lab connects four open-source projects around one Kafka broker so developers and platform teams can evaluate Kafka inspection, adaptive consumption, AI-assisted diagnosis and optional local AI capabilities in one reproducible environment.
 
@@ -13,11 +28,18 @@ flowchart LR
   S[SpectraLLM] -. optional local AI / knowledge .-> A
 ```
 
+### One lab, four complementary capabilities
+
+| Observe | Adapt | Diagnose | Knowledge |
+|:---:|:---:|:---:|:---:|
+| **Kafka SQL Explorer** | **KafkaConsumerAutoTune** | **Kex Agent AI** | **SpectraLLM** |
+| Inspect, query, trace and audit Kafka | Adapt consumer settings to Kafka traffic | Use read-only Kafka evidence through MCP | Add optional private local AI and RAG |
+
 The integrated demo produces Kafka traffic, lets **KafkaConsumerAutoTune** consume and adapt, exposes the broker through **Kafka SQL Explorer**, and gives **Kex Agent AI** a read-only MCP path for assisted diagnosis. **SpectraLLM** adds optional local AI and knowledge capabilities.
 
 Kex Lab is an integration and evaluation repository. The four products remain independent projects.
 
-## Start here
+## 🚀 Start here
 
 Requirements: Docker Engine with Compose v2.
 
@@ -72,7 +94,7 @@ make smoke
 
 Stop with `make down`, or use `make reset` to also remove volumes.
 
-## Components
+## 🧩 Components
 
 | Project | What it contributes to the Lab |
 |---|---|
@@ -81,7 +103,7 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 | [KafkaConsumerAutoTune](https://github.com/devdownin/kafkaconsumerautotune) | Consumes Kafka traffic and adapts consumer settings using PID-based tuning, with resilience and observability |
 | [SpectraLLM](https://github.com/devdownin/SpectraLLM) | Provides optional private local RAG, document ingestion, fine-tuning and local LLM serving |
 
-## Architecture
+## 🏗️ Architecture
 
 ```mermaid
 flowchart LR
@@ -93,7 +115,7 @@ flowchart LR
   T -. consumer state / metrics .-> K
 ```
 
-## Evaluation and observability
+## 📊 Evaluation and observability
 
 Individual products can also be evaluated from their upstream repositories. `make components` clones them under `.components/`; then run `sh scripts/evaluate.sh <component>`.
 
@@ -107,7 +129,7 @@ make observability-up
 
 Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
 
-## Principles
+## 🔒 Principles
 
 - Published images first for fast evaluation.
 - One shared Kafka in the core Lab stack.
@@ -116,7 +138,7 @@ Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/
 - Smoke checks report failures instead of masking unavailable capabilities.
 - The Lab is resettable without touching source repositories.
 
-## Layout
+## 📁 Repository layout
 
 ```text
 .
@@ -133,6 +155,6 @@ Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/
     └── EVALUATION.md
 ```
 
-## Licenses
+## 📄 Licenses
 
 Each upstream project keeps its own license. Consult the corresponding repository before redistribution or modification.
