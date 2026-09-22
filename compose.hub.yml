@@ -21,8 +21,8 @@ services:
     volumes:
       - spectra_data:/app/data
     depends_on:
-      kafka:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
       spectra-chromadb:
         condition: service_started
     restart: unless-stopped
