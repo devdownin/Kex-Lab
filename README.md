@@ -87,7 +87,7 @@ make observability-up
 # Grafana:    http://localhost:3000
 ```
 
-Image versions are centralized in `versions.env`. Integration boundaries are documented in [docs/CONTRACTS.md](docs/CONTRACTS.md).
+Image versions are centralized in `versions.env`. Integration boundaries are documented in [docs/CONTRACTS.md](docs/CONTRACTS.md). The evidence checklist is in [docs/SCORECARD.md](docs/SCORECARD.md).
 
 ## Principles
 
