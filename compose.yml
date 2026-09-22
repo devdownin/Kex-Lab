@@ -2,7 +2,7 @@ name: kex-lab
 
 services:
   kafka:
-    image: apache/kafka:4.3.1
+    image: ${KAFKA_IMAGE:-apache/kafka:4.3.1}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${KAFKA_PORT:-9092}:9092"
     environment:
@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
 
   explorer:
-    image: compagnonsdudev/kafkaexplorer:latest
+    image: ${EXPLORER_IMAGE:-compagnonsdudev/kafkaexplorer:latest}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${EXPLORER_PORT:-8080}:8080"
     environment:
@@ -53,7 +53,7 @@ services:
     restart: unless-stopped
 
   agent:
-    image: compagnonsdudev/kex-agent-ai:latest
+    image: ${KEX_AGENT_IMAGE:-compagnonsdudev/kex-agent-ai:latest}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${KEX_AGENT_PORT:-8081}:8081"
     environment:
