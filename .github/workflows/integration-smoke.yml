@@ -1,0 +1,22 @@
+name: Integration Smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      EXPLORER_MCP_AUTH_TOKEN: ci-mcp-token
+      KEX_AGENT_API_KEY: ci-agent-key
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare environment
+        run: cp .env.example .env
+      - name: Run integrated Kafka smoke
+        run: make integration-smoke
