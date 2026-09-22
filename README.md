@@ -11,11 +11,20 @@
 [![MCP](https://img.shields.io/badge/MCP-read--only-5C5C5C)](https://modelcontextprotocol.io/)
 [![GitHub](https://img.shields.io/badge/source-open-181717?logo=github)](https://github.com/devdownin/Kex-Lab)
 
-**Observe Kafka · Adapt consumers · Diagnose with AI · Keep knowledge local**
+**OBSERVE** Kafka · **ADAPT** consumers · **DIAGNOSE** with AI · **KEEP KNOWLEDGE LOCAL**
 
 </div>
 
 ---
+
+<table>
+<tr>
+<td width="25%" align="center"><strong>🔎 OBSERVE</strong><br><sub>Kafka SQL Explorer</sub><br><br>Inspect, query, trace and audit Kafka</td>
+<td width="25%" align="center"><strong>⚙️ ADAPT</strong><br><sub>KafkaConsumerAutoTune</sub><br><br>Adapt consumer settings to Kafka traffic</td>
+<td width="25%" align="center"><strong>🤖 DIAGNOSE</strong><br><sub>Kex Agent AI</sub><br><br>Use read-only Kafka evidence through MCP</td>
+<td width="25%" align="center"><strong>🧠 KNOWLEDGE</strong><br><sub>SpectraLLM</sub><br><br>Optional private local AI and RAG</td>
+</tr>
+</table>
 
 Kex Lab connects four open-source projects around one Kafka broker so developers and platform teams can evaluate Kafka inspection, adaptive consumption, AI-assisted diagnosis and optional local AI capabilities in one reproducible environment.
 
@@ -28,12 +37,7 @@ flowchart LR
   S[SpectraLLM] -. optional local AI / knowledge .-> A
 ```
 
-### One lab, four complementary capabilities
-
-| Observe | Adapt | Diagnose | Knowledge |
-|:---:|:---:|:---:|:---:|
-| **Kafka SQL Explorer** | **KafkaConsumerAutoTune** | **Kex Agent AI** | **SpectraLLM** |
-| Inspect, query, trace and audit Kafka | Adapt consumer settings to Kafka traffic | Use read-only Kafka evidence through MCP | Add optional private local AI and RAG |
+### From events to insights
 
 The integrated demo produces Kafka traffic, lets **KafkaConsumerAutoTune** consume and adapt, exposes the broker through **Kafka SQL Explorer**, and gives **Kex Agent AI** a read-only MCP path for assisted diagnosis. **SpectraLLM** adds optional local AI and knowledge capabilities.
 
@@ -41,9 +45,11 @@ Kex Lab is an integration and evaluation repository. The four products remain in
 
 ## 🚀 Start here
 
-Requirements: Docker Engine with Compose v2.
+> **Goal:** get the published Kex applications running together around a shared Kafka broker.
 
-### Evaluate the complete published stack
+**Requirement:** Docker Engine with Compose v2.
+
+### Complete stack · Docker images
 
 No application source build is required. Kex Lab uses the published Docker Hub images for the four projects (five application images because SpectraLLM has separate backend and frontend images).
 
@@ -65,7 +71,7 @@ SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_M
 
 Stop the complete stack with `make hub-down`.
 
-### Run the Kafka diagnosis scenario
+### ⚡ See the Kafka scenario in action
 
 ```bash
 make demo-basic
@@ -80,7 +86,7 @@ make demo-overload
 make report
 ```
 
-### Evaluate only the core
+### 📦 Prefer a smaller starting point?
 
 For Kafka + Explorer + Kex Agent:
 
@@ -94,7 +100,7 @@ make smoke
 
 Stop with `make down`, or use `make reset` to also remove volumes.
 
-## 🧩 Components
+## 🧩 Explore the stack
 
 | Project | What it contributes to the Lab |
 |---|---|
@@ -103,7 +109,7 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 | [KafkaConsumerAutoTune](https://github.com/devdownin/kafkaconsumerautotune) | Consumes Kafka traffic and adapts consumer settings using PID-based tuning, with resilience and observability |
 | [SpectraLLM](https://github.com/devdownin/SpectraLLM) | Provides optional private local RAG, document ingestion, fine-tuning and local LLM serving |
 
-## 🏗️ Architecture
+## 🏗️ How it connects
 
 ```mermaid
 flowchart LR
@@ -115,7 +121,7 @@ flowchart LR
   T -. consumer state / metrics .-> K
 ```
 
-## 📊 Evaluation and observability
+## 📊 Evaluate with evidence
 
 Individual products can also be evaluated from their upstream repositories. `make components` clones them under `.components/`; then run `sh scripts/evaluate.sh <component>`.
 
