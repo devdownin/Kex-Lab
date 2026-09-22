@@ -4,7 +4,7 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 cd "$ROOT"
 [ -f .env ] && set -a && . ./.env && set +a
 
-COMPOSE="docker compose -f compose.yml -f compose.autotune.yml"
+COMPOSE="docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml"
 
 echo "KEX LAB — end-to-end demo"
 echo "Starting Kafka, Explorer, Agent and AutoTune..."
