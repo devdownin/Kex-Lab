@@ -1,4 +1,20 @@
 services:
+  kafka-init:
+    image: ${KAFKA_IMAGE:-apache/kafka:4.3.1}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./scripts/kafka-init.sh:/opt/kex-lab/kafka-init.sh:ro
+    entrypoint: ["sh", "/opt/kex-lab/kafka-init.sh"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KEX_LAB_TOPIC: ${KEX_LAB_TOPIC:-demo.app.topic}
+      KEX_LAB_DLT_TOPIC: ${KEX_LAB_DLT_TOPIC:-demo.app.topic.dlt}
+      KEX_LAB_PARTITIONS: ${KEX_LAB_PARTITIONS:-6}
+      KEX_LAB_MESSAGES: ${KEX_LAB_MESSAGES:-500}
+    restart: "no"
+
   prometheus:
     image: ${PROMETHEUS_IMAGE:-prom/prometheus:v3.5.0}
     ports:
