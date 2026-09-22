@@ -8,8 +8,8 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     entrypoint: ["java", "-jar", "app.jar"]
     depends_on:
-      kafka:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   traffic:
@@ -18,8 +18,8 @@ services:
       kafka:
         condition: service_healthy
     volumes:
-      - ./scenarios/end-to-end/produce.sh:/opt/kex-lab/produce.sh:ro
-    entrypoint: ["sh", "/opt/kex-lab/produce.sh"]
+      - ./scripts/kafka-init.sh:/opt/kex-lab/kafka-init.sh:ro
+    entrypoint: ["sh", "/opt/kex-lab/kafka-init.sh"]
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       KEX_LAB_TOPIC: demo.app.topic
