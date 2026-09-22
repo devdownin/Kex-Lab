@@ -31,6 +31,7 @@ Requirements: Docker Engine with Compose v2.
 
 ```bash
 cp .env.example .env
+make doctor
 make up
 make status
 make smoke
@@ -67,6 +68,26 @@ make demo
 ```
 
 This produces records to `demo.app.topic`, lets AutoTune consume/adapt, exposes the same broker through Explorer, and gives Kex Agent an MCP evidence path for diagnosis. See [docs/END-TO-END.md](docs/END-TO-END.md).
+
+Reproducible scenarios:
+
+```bash
+make demo-basic
+make demo-lag
+make demo-dlt
+make demo-overload
+make report
+```
+
+Optional cross-project observability:
+
+```bash
+make observability-up
+# Prometheus: http://localhost:9090
+# Grafana:    http://localhost:3000
+```
+
+Image versions are centralized in `versions.env`. Integration boundaries are documented in [docs/CONTRACTS.md](docs/CONTRACTS.md).
 
 ## Principles
 
