@@ -1,0 +1,31 @@
+services:
+  autotune:
+    image: devdownin/kafkaconsumerautotune:latest
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${AUTOTUNE_PORT:-8082}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      DB_HOST: autotune-db-bypass
+      DB_USER: sa
+      DB_PASSWORD: ""
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-noop:4318/v1/traces
+      MANAGEMENT_OTLP_METRICS_EXPORT_URL: http://otel-noop:4318/v1/metrics
+    entrypoint: ["java", "-jar", "app.jar"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  traffic:
+    image: apache/kafka:4.3.1
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - ./scenarios/end-to-end/produce.sh:/opt/kex-lab/produce.sh:ro
+    entrypoint: ["sh", "/opt/kex-lab/produce.sh"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KEX_LAB_TOPIC: demo.app.topic
+      KEX_LAB_MESSAGES: ${KEX_LAB_MESSAGES:-500}
