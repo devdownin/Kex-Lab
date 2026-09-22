@@ -1,7 +1,7 @@
 SHELL := /bin/sh
-COMPOSE := docker compose -f compose.yml
+COMPOSE := docker compose --env-file versions.env -f compose.yml
 
-.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic
+.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report observability-up observability-down demo-basic demo-lag demo-dlt demo-overload
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -35,7 +35,31 @@ demo: setup
 	sh scripts/demo.sh
 
 traffic: setup
-	docker compose -f compose.yml -f compose.autotune.yml run --rm traffic
+	docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml run --rm traffic
 
 demo-down:
-	docker compose -f compose.yml -f compose.autotune.yml down
+	docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml down
+
+doctor:
+	sh scripts/doctor.sh
+
+report:
+	sh scripts/report.sh
+
+demo-basic: setup
+	sh scripts/scenario.sh basic
+
+demo-lag: setup
+	sh scripts/scenario.sh lag
+
+demo-dlt: setup
+	sh scripts/scenario.sh dlt
+
+demo-overload: setup
+	sh scripts/scenario.sh overload
+
+observability-up: setup
+	docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml -f compose.observability.yml up -d
+
+observability-down:
+	docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml -f compose.observability.yml down
