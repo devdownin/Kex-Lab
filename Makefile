@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 COMPOSE := docker compose --env-file versions.env -f compose.yml
 
-.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health
+.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-full profile-demo integration-smoke
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -81,3 +81,17 @@ hub-down:
 
 hub-status:
 	sh scripts/hub.sh ps
+
+profile-core: setup
+	docker compose --env-file versions.env -f compose.yml up -d kafka explorer
+
+profile-ai: setup
+	docker compose --env-file versions.env -f compose.yml up -d kafka explorer agent
+
+profile-full: setup
+	sh scripts/hub.sh up
+
+profile-demo: demo
+
+integration-smoke: setup
+	sh scripts/integration-smoke.sh
