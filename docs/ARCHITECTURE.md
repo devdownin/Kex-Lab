@@ -4,6 +4,31 @@
 
 Kex Lab is an integration boundary, not a monorepo. Each product remains independently releasable and keeps its own runtime, tests and license.
 
+## Runtime topology
+
+```mermaid
+flowchart LR
+    P[Scenario producer] -->|demo.app.topic| K[(Kafka 4.3)]
+    K -->|bootstrap kafka:29092| E[Kafka SQL Explorer]
+    K -->|consumer workload| T[KafkaConsumerAutoTune]
+    E -->|read-only MCP tools| A[Kex Agent AI]
+    A -->|optional inference / RAG| S[SpectraLLM API]
+    SF[Spectra frontend] --> S
+    S --> C[(ChromaDB)]
+    S -. optional Kafka ingestion .-> K
+```
+
+| Boundary | Contract |
+|---|---|
+| Scenario → Kafka | Deterministic records injected by the Lab scenarios |
+| Explorer → Kafka | Inspection/query access to the shared broker |
+| AutoTune → Kafka | Consumer workload and consumer-group state |
+| Agent → Explorer | Read-only MCP tools; Kafka evidence remains bounded by Explorer |
+| Agent → Spectra | Optional local model/knowledge path when configured |
+| Spectra → Kafka | Optional ingestion of configured topics |
+
+The shared Docker network makes services reachable by name, but network reachability is not treated as authorization. In particular, the Agent's intended Kafka evidence path remains Explorer's read-only MCP boundary.
+
 ## Capability map
 
 | Layer | Project | Responsibility |
@@ -14,7 +39,7 @@ Kex Lab is an integration boundary, not a monorepo. Each product remains indepen
 | Governed reasoning | Kex Agent AI | Tool selection, supervision, policy, approvals and audit |
 | Private AI knowledge | SpectraLLM | Local RAG, ingestion, fine-tuning and model deployment |
 
-## Core integration
+## Diagnosis path
 
 ```mermaid
 sequenceDiagram
@@ -23,22 +48,21 @@ sequenceDiagram
     participant E as Kafka SQL Explorer
     participant K as Kafka
     U->>A: operational question
-    A->>E: MCP tool call
+    A->>E: read-only MCP tool call
     E->>K: inspect/query
-    K-->>E: evidence
-    E-->>A: bounded result + coverage
-    A-->>U: answer + tool trace
+    K-->>E: Kafka evidence
+    E-->>A: bounded result
+    A-->>U: assisted diagnosis + tool trace
 ```
 
-The Lab core deliberately reuses Explorer's read-only MCP boundary. The agent does not receive direct Kafka mutation rights merely because it shares a network with the broker.
+## Demo path
 
-## Why AutoTune and Spectra are not forced into the core Compose
+`make demo` is the shortest integrated path. It validates Docker, starts the published Docker Hub images, waits for readiness, injects the basic scenario and prints the Lab health view and application entry points.
 
-AutoTune's maintained demo includes Oracle, Prometheus, OpenTelemetry, Jaeger, Grafana and Loki. SpectraLLM has a multi-service local AI stack and downloads several GB of model weights. Duplicating those definitions here would create configuration drift and make the first evaluation unnecessarily heavy.
+Use `make demo-lag`, `make demo-dlt` and `make demo-overload` for deliberately stressed scenarios. These are evaluation scenarios, not production workload models.
 
-Kex Lab therefore has two levels:
+## Deployment profiles
 
-1. **Core Compose** — fast integration path: Kafka + Explorer + Agent.
-2. **Upstream scenarios** — scripts clone and launch the maintained AutoTune and Spectra stacks when those capabilities are being evaluated.
+The core Compose remains useful for a smaller Kafka + Explorer + Agent evaluation. The Docker Hub path layers AutoTune and Spectra on top using published images. Observability remains an optional Compose overlay so the default demo does not require Prometheus and Grafana.
 
-A later end-to-end scenario can add adapters only where there is a stable contract worth testing; it should not copy whole upstream Compose files.
+Image versions are centralized in `versions.env`; environment-specific configuration belongs in `.env`.
