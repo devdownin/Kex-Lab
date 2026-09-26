@@ -13,5 +13,8 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 - Compatibility manifest in `versions.env`.
 - Optional operational review profile for compatible KafkaExplorer and Kex Agent AI images: single-broker `lab` topic policy, declared demo DLT source, and persisted lag baselines. The Agent end-to-end check now uses its current authenticated chat API and checks a real MCP tool invocation.
 
+### Changed
+- Pin the published KafkaExplorer `2.1.1` and Kex Agent AI `0.9.16` Docker Hub tags in the compatibility manifest and Compose defaults for the operational review profile.
+
 ### Release process
 A Kex Lab release is created from a `vX.Y.Z` tag. The release workflow validates the compatibility manifest and publishes release notes containing the exact component image references from `versions.env`.
