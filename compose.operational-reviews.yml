@@ -1,0 +1,16 @@
+# Optional operational review profile. Requires Explorer/Agent images that contain
+# kex_topic_policy_review, kex_consumer_lag_trend and kex_dlq_review.
+services:
+  explorer:
+    environment:
+      EXPLORER_MCP_LAG_HISTORY_DIRECTORY: /app/data/mcp-lag-history
+      # This is a single-broker Lab rule, deliberately not a production policy.
+      # The DLT route declares a source only; this Lab does not configure retry,
+      # monitoring or replay services for it.
+      SPRING_APPLICATION_JSON: >-
+        {"explorer":{"mcp":{"topic-policies":[{"environment":"lab","min-replicas":1,"min-in-sync-replicas":1,"cleanup-policy":"delete"}],"dlq-routes":[{"queue-topic":"${KEX_LAB_DLT_TOPIC:-demo.app.topic.dlt}","source-topic":"${KEX_LAB_TOPIC:-demo.app.topic}"}]}}}
+    volumes:
+      - explorer_state:/app/data
+
+volumes:
+  explorer_state:
