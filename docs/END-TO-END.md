@@ -45,6 +45,11 @@ Then ask the Agent:
 
 The expected proof is a chain of evidence rather than a predetermined prose answer: the Agent should invoke Explorer's MCP tools, Explorer should read the same Kafka broker, and the resulting state should correspond to the consumer activity visible in AutoTune.
 
+For explicit topic rules, a lag baseline that persists after restarting
+Explorer, and declared DLT lineage, use the optional
+[Kafka operational review profile](OPERATIONAL-REVIEWS.md) with compatible
+images. Those capabilities are not prerequisites for the base demo.
+
 ## Change the load
 
 ```bash

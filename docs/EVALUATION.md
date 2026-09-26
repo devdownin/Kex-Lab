@@ -20,6 +20,15 @@ Success criteria:
 - Explorer can inspect the shared broker.
 - With a model configured, the agent discovers and calls Explorer through MCP.
 
+## Optional Kafka operational review
+
+See [the operational review walkthrough](OPERATIONAL-REVIEWS.md) for the
+compatible image prerequisite and `make profile-reviews`. Check the `lab`
+topic policy, take two complete readings of an actual consumer group's lag,
+then review the demo DLT. Record `NOT_CONFIGURED` or `UNMEASURED` as a lack of
+evidence, not as a pass. A DLT source route is an operator declaration; a
+malformed source record does not demonstrate that it was forwarded.
+
 ## 30–60 minutes — Kafka SQL Explorer
 
 ```bash

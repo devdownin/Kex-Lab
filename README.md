@@ -98,7 +98,27 @@ make demo-overload
 make report
 ```
 
-Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect. Run `SCENARIO=lag make scenario-assert` to execute a scenario with machine-checkable assertions. `make agent-e2e` additionally exercises the Agent → Explorer MCP diagnosis when a model provider and a stable Agent chat endpoint are configured.
+Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect. Run `SCENARIO=lag make scenario-assert` to execute a scenario with machine-checkable assertions. `make agent-e2e` additionally checks an actual Agent → Explorer MCP tool call when a model provider is configured.
+
+### 🔎 Review lag, topic rules and dead letters
+
+KafkaExplorer now offers read-only MCP tools for topic configuration and
+environment-specific policy checks, comparisons of two complete consumer-lag
+readings, and DLQ reviews with declared source/retry/replay references. Kex Agent
+AI can use them while distinguishing measured Kafka evidence from configured
+expectations. For the **one-broker Lab**, an optional profile declares a `lab`
+policy (one replica, one in-sync replica), maps the demo DLT to its source,
+and persists lag baselines in Explorer's `/app/data` volume:
+
+```bash
+# Select compatible Explorer and Agent image tags or digests in .env first.
+make profile-reviews
+```
+
+The currently published `latest` tags may predate these tools; confirm them in
+Explorer's MCP catalog before using the new prompts. The Lab does not claim
+that injecting a malformed source record automatically populates the DLT.
+See [the walkthrough and image requirements](docs/OPERATIONAL-REVIEWS.md).
 
 ```bash
 make report
@@ -110,6 +130,7 @@ make report
 |---|---|---|
 | Inspect Kafka | `make profile-core` | Kafka + Explorer |
 | Add governed AI diagnosis | `make profile-ai` | Kafka + Explorer + Agent |
+| Evaluate operational reviews | `make profile-reviews` | Kafka + Explorer + Agent with optional `lab` policy, DLT source declaration and persisted lag baseline |
 | Run the complete published stack | `make profile-full` | Kafka + Explorer + Agent + AutoTune + Spectra |
 | Run the guided scenario | `make profile-demo` | Full stack + readiness + traffic + health view |
 
@@ -133,8 +154,8 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 
 | Project | What it contributes to the Lab |
 |---|---|
-| [Kex Agent AI](https://github.com/devdownin/Kex-agent-ai) | Uses governed actions, supervision and human approval; accesses Kafka evidence through Explorer's MCP tools |
-| [Kafka SQL Explorer](https://github.com/devdownin/Kafkaexplorer) | Inspects, queries, traces and audits Kafka; exposes read-only MCP tools |
+| [Kex Agent AI](https://github.com/devdownin/Kex-agent-ai) | Uses governed actions, supervision and human approval; interprets Explorer's lag, policy and DLQ evidence through MCP |
+| [Kafka SQL Explorer](https://github.com/devdownin/Kafkaexplorer) | Inspects, queries, traces and audits Kafka; exposes read-only operational reviews and configurable topic expectations |
 | [KafkaConsumerAutoTune](https://github.com/devdownin/kafkaconsumerautotune) | Consumes Kafka traffic and adapts consumer settings using PID-based tuning, with resilience and observability |
 | [SpectraLLM](https://github.com/devdownin/SpectraLLM) | Provides optional private local RAG, document ingestion, fine-tuning and local LLM serving |
 
@@ -142,7 +163,8 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 
 ```mermaid
 flowchart LR
-  K[(Kafka 4.3)] --> I[kafka-init]\n  I -->|create topics + seed records| K
+  K[(Kafka 4.3)] --> I[kafka-init]
+  I -->|create topics + seed records| K
   K -->|topics / records| E[Kafka SQL Explorer]
   K -->|consumer workload| T[KafkaConsumerAutoTune]
   E -->|read-only MCP tools| A[Kex Agent AI]
@@ -169,7 +191,7 @@ make observability-up
 # Dashboard:  Kex Lab / Kex Lab — Integrated Operations
 ```
 
-Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
+Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/OPERATIONAL-REVIEWS.md](docs/OPERATIONAL-REVIEWS.md) for the new MCP reviews, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
 
 ## 🏷️ Releases
 
@@ -195,7 +217,8 @@ Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the man
 ├── Makefile
 ├── scripts/
 │   ├── components.sh
-│   ├── kafka-init.sh\n│   ├── quick-demo.sh
+│   ├── kafka-init.sh
+│   ├── quick-demo.sh
 │   ├── health.sh
 │   ├── status.sh
 │   ├── smoke-test.sh

@@ -15,6 +15,9 @@ The scorecard records evidence, not a product ranking.
 | DLT scenario | deliberately invalid record is injected and its handling can be inspected |
 | Overload scenario | 50,000 records provide sustained load |
 | MCP | Agent trace shows Explorer tool invocation |
+| Optional topic review | `lab` policy result cites replica/ISR/configuration evidence or reports `NOT_CONFIGURED` / `UNMEASURED` |
+| Optional lag trend | Two complete readings for the same topic/group; the first reading alone has no trend |
+| Optional DLT review | Source declaration is separate from observed Kafka metadata; replay/monitoring are not inferred |
 | Observability | Prometheus targets expose available application metrics |
 | Reproducibility | image set captured from `versions.env` |
 | Report | `reports/latest.md` generated |

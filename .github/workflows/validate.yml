@@ -22,6 +22,8 @@ jobs:
           docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml config -q
           docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml -f compose.observability.yml config -q
           docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml -f compose.hub.yml config -q
+          docker compose --env-file versions.env -f compose.yml -f compose.operational-reviews.yml config -q
+          docker compose --env-file versions.env -f compose.yml -f compose.operational-reviews.yml config --format json | python3 -c 'import json,sys; d=json.load(sys.stdin); p=json.loads(d["services"]["explorer"]["environment"]["SPRING_APPLICATION_JSON"]); assert p["explorer"]["mcp"]["dlq-routes"][0]["queue-topic"] == "demo.app.topic.dlt"'
       - name: Validate shell scripts
         run: |
           for script in scripts/*.sh; do
