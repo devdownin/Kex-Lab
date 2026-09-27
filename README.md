@@ -111,14 +111,14 @@ policy (one replica, one in-sync replica), maps the demo DLT to its source,
 and persists lag baselines in Explorer's `/app/data` volume:
 
 ```bash
-# Select compatible Explorer and Agent image tags or digests in .env first.
+# The compatibility manifest selects Explorer 2.1.1 and Agent 0.9.16.
 make profile-reviews
 ```
 
-The currently published `latest` tags may predate these tools; confirm them in
-Explorer's MCP catalog before using the new prompts. The Lab does not claim
-that injecting a malformed source record automatically populates the DLT.
-See [the walkthrough and image requirements](docs/OPERATIONAL-REVIEWS.md).
+Check the review tools in Explorer's MCP catalog before using the new prompts.
+The Lab does not claim that injecting a malformed source record automatically
+populates the DLT.
+See [the walkthrough and image versions](docs/OPERATIONAL-REVIEWS.md).
 
 ```bash
 make report

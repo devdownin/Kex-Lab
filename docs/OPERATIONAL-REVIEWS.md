@@ -7,34 +7,22 @@ declarations. This Lab provides an **optional** configuration for its single bro
 
 ## Image compatibility
 
-The `latest` Docker Hub tags in `versions.env` are moving references. At the time
-this Lab guide was updated, they predated the upstream operational review changes.
-Select Explorer and Agent images built from revisions containing those changes
+`versions.env` selects the published Docker Hub tags
+[`compagnonsdudev/kafkaexplorer:2.1.1`](https://hub.docker.com/r/compagnonsdudev/kafkaexplorer/tags?name=2.1.1)
+and [`compagnonsdudev/kex-agent-ai:0.9.16`](https://hub.docker.com/r/compagnonsdudev/kex-agent-ai/tags?name=0.9.16).
+These releases include the operational review changes
 ([Explorer PR #426](https://github.com/devdownin/Kafkaexplorer/pull/426),
-[Agent PR #129](https://github.com/devdownin/Kex-agent-ai/pull/129)) before trying
-the walkthrough. Set `EXPLORER_IMAGE` and `KEX_AGENT_IMAGE` in `.env` to their
-released tags or pinned digests; publishing a Docker Hub description does not
-update an image. Confirm `kex_topic_policy_review`, `kex_consumer_lag_trend` and
-`kex_dlq_review` in Explorer's **MCP** tool catalog. If they are missing, update
-the image references; the Lab does not simulate their answers.
-
-Until compatible published images are available, you can build the merged
-upstream `main` branches locally and use those tags in `.env`:
-
-```bash
-git clone --depth 1 https://github.com/devdownin/Kafkaexplorer.git ../Kafkaexplorer
-docker build -t kex-lab-explorer:reviews ../Kafkaexplorer
-git clone --depth 1 https://github.com/devdownin/Kex-agent-ai.git ../Kex-agent-ai
-docker build -t kex-lab-agent:reviews ../Kex-agent-ai
-# In .env: EXPLORER_IMAGE=kex-lab-explorer:reviews
-# In .env: KEX_AGENT_IMAGE=kex-lab-agent:reviews
-```
+[Agent PR #129](https://github.com/devdownin/Kex-agent-ai/pull/129)).
+Confirm `kex_topic_policy_review`, `kex_consumer_lag_trend` and
+`kex_dlq_review` in Explorer's **MCP** tool catalog after starting the profile.
+You can override either tag through `EXPLORER_IMAGE` and `KEX_AGENT_IMAGE` in
+`.env`; if a tool is missing, verify the actual image reference used by Compose.
 
 ## Start the optional profile
 
 ```bash
 cp .env.example .env
-# Edit .env: replace the development tokens and select compatible image references.
+# Edit .env: replace the development tokens.
 make profile-reviews
 ```
 
