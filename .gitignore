@@ -1,3 +1,7 @@
 .env
 .components/
 .DS_Store
+
+.env.timesfm
+.timesfm/
+__pycache__/
