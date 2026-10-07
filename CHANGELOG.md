@@ -11,10 +11,11 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 - Cross-component integration smoke test in GitHub Actions.
 - Explicit runtime architecture and integration boundaries.
 - Compatibility manifest in `versions.env`.
-- Optional operational review profile for compatible KafkaExplorer and Kex Agent AI images: single-broker `lab` topic policy, declared demo DLT source, and persisted lag baselines. The Agent end-to-end check now uses its current authenticated chat API and checks a real MCP tool invocation.
+- Optional operational review profile for compatible KafkaExplorer and Kex-anHarness images: single-broker `lab` topic policy, declared demo DLT source, and persisted lag baselines. The Agent end-to-end check now uses its current authenticated chat API and checks a real MCP tool invocation.
 
 ### Changed
-- Pin the published KafkaExplorer `2.1.1` and Kex Agent AI `0.9.16` Docker Hub tags in the compatibility manifest and Compose defaults for the operational review profile.
+- Update Kex-anHarness names, source links and component checkout paths after the GitHub repository rename; retain the existing Docker image references.
+- Pin the published KafkaExplorer `2.1.1` and Kex-anHarness `0.9.16` Docker Hub tags in the compatibility manifest and Compose defaults for the operational review profile.
 
 ### Release process
 A Kex Lab release is created from a `vX.Y.Z` tag. The release workflow validates the compatibility manifest and publishes release notes containing the exact component image references from `versions.env`.

@@ -21,7 +21,7 @@
 <tr>
 <td width="25%" align="center"><strong>🔎 OBSERVE</strong><br><sub>Kafka SQL Explorer</sub><br><br>Inspect, query, trace and audit Kafka</td>
 <td width="25%" align="center"><strong>⚙️ ADAPT</strong><br><sub>KafkaConsumerAutoTune</sub><br><br>Adapt consumer settings to Kafka traffic</td>
-<td width="25%" align="center"><strong>🤖 DIAGNOSE</strong><br><sub>Kex Agent AI</sub><br><br>Use read-only Kafka evidence through MCP</td>
+<td width="25%" align="center"><strong>🤖 DIAGNOSE</strong><br><sub>Kex-anHarness</sub><br><br>Use read-only Kafka evidence through MCP</td>
 <td width="25%" align="center"><strong>🧠 KNOWLEDGE</strong><br><sub>SpectraLLM</sub><br><br>Optional private local AI and RAG</td>
 </tr>
 </table>
@@ -33,13 +33,13 @@ flowchart LR
   P[Produce Kafka traffic] --> K[(Kafka)]
   K --> T[KafkaConsumerAutoTune]
   K --> E[Kafka SQL Explorer]
-  E -->|read-only MCP| A[Kex Agent AI]
+  E -->|read-only MCP| A[Kex-anHarness]
   S[SpectraLLM] -. optional local AI / knowledge .-> A
 ```
 
 ### From events to insights
 
-The integrated demo produces Kafka traffic, lets **KafkaConsumerAutoTune** consume and adapt, exposes the broker through **Kafka SQL Explorer**, and gives **Kex Agent AI** a read-only MCP path for assisted diagnosis. **SpectraLLM** adds optional local AI and knowledge capabilities.
+The integrated demo produces Kafka traffic, lets **KafkaConsumerAutoTune** consume and adapt, exposes the broker through **Kafka SQL Explorer**, and gives **Kex-anHarness** a read-only MCP path for assisted diagnosis. **SpectraLLM** adds optional local AI and knowledge capabilities.
 
 Kex Lab is an integration and evaluation repository. The four products remain independent projects.
 
@@ -61,11 +61,11 @@ make demo
 Open:
 
 - Kafka SQL Explorer: **http://localhost:8080**
-- Kex Agent AI: **http://localhost:8081**
+- Kex-anHarness: **http://localhost:8081**
 - KafkaConsumerAutoTune: **http://localhost:8082/dashboard**
 - SpectraLLM: **http://localhost:8084**
 
-SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup. Kex Agent chat requires a configured model provider/API key.
+SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup. Kex-anHarness chat requires a configured model provider/API key.
 
 Kafka initialization is part of the Compose lifecycle: the one-shot `kafka-init` service waits for Kafka, creates the configured application and DLT topics, then seeds the application topic before dependent services start. `make demo` checks prerequisites, starts the published stack, waits for readiness, runs the basic scenario, prints the health dashboard and the application URLs. Stop the complete stack with `make hub-down`.
 
@@ -104,8 +104,8 @@ Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-r
 
 KafkaExplorer now offers read-only MCP tools for topic configuration and
 environment-specific policy checks, comparisons of two complete consumer-lag
-readings, and DLQ reviews with declared source/retry/replay references. Kex Agent
-AI can use them while distinguishing measured Kafka evidence from configured
+readings, and DLQ reviews with declared source/retry/replay references. Kex-anHarness
+can use them while distinguishing measured Kafka evidence from configured
 expectations. For the **one-broker Lab**, an optional profile declares a `lab`
 policy (one replica, one in-sync replica), maps the demo DLT to its source,
 and persists lag baselines in Explorer's `/app/data` volume:
@@ -138,7 +138,7 @@ The compatible image set is centralized in `versions.env`, which acts as the Lab
 
 ### 📦 Prefer a smaller starting point?
 
-For Kafka + Explorer + Kex Agent:
+For Kafka + Explorer + Kex-anHarness:
 
 ```bash
 cp .env.example .env
@@ -154,7 +154,7 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 
 | Project | What it contributes to the Lab |
 |---|---|
-| [Kex Agent AI](https://github.com/devdownin/Kex-agent-ai) | Uses governed actions, supervision and human approval; interprets Explorer's lag, policy and DLQ evidence through MCP |
+| [Kex-anHarness](https://github.com/devdownin/Kex-anHarness) | Uses governed actions, supervision and human approval; interprets Explorer's lag, policy and DLQ evidence through MCP |
 | [Kafka SQL Explorer](https://github.com/devdownin/Kafkaexplorer) | Inspects, queries, traces and audits Kafka; exposes read-only operational reviews and configurable topic expectations |
 | [KafkaConsumerAutoTune](https://github.com/devdownin/kafkaconsumerautotune) | Consumes Kafka traffic and adapts consumer settings using PID-based tuning, with resilience and observability |
 | [SpectraLLM](https://github.com/devdownin/SpectraLLM) | Provides optional private local RAG, document ingestion, fine-tuning and local LLM serving |
@@ -162,18 +162,18 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 ## 🏗️ How it connects
 
 ```mermaid
-flowchart LR
-  K[(Kafka 4.3)] --> I[kafka-init]
-  I -->|create topics + seed records| K
-  K -->|topics / records| E[Kafka SQL Explorer]
-  K -->|consumer workload| T[KafkaConsumerAutoTune]
-  E -->|read-only MCP tools| A[Kex Agent AI]
-  A -->|optional local inference| S[SpectraLLM]
-  S -->|optional Kafka ingestion| K
-  T -. consumer state / metrics .-> K
+flowchart TD
+  I["kafka-init"] -->|create topics and seed records| K[("Kafka 4.3")]
+  K -->|topics and records| E["Kafka SQL Explorer"]
+  K -->|consumer workload| T["KafkaConsumerAutoTune"]
+  T -. consumer state and metrics .-> K
+  A["Kex-anHarness"] -->|read-only MCP calls| E
+  E -->|Kafka evidence| A
+  A -. optional local inference .-> S["SpectraLLM"]
+  S -. optional Kafka ingestion .-> K
 ```
 
-**Runtime boundaries:** Kafka is the shared event backbone; Explorer owns inspection and the read-only MCP evidence boundary; AutoTune consumes Kafka traffic and adapts its consumer settings; Kex Agent reasons over governed MCP evidence rather than receiving Kafka mutation rights; Spectra is optional local inference/knowledge infrastructure. See [the detailed architecture](docs/ARCHITECTURE.md).
+**Runtime boundaries:** Kafka is the shared event backbone; Explorer owns inspection and the read-only MCP evidence boundary; AutoTune consumes Kafka traffic and adapts its consumer settings; Kex-anHarness reasons over governed MCP evidence rather than receiving Kafka mutation rights; Spectra is optional local inference/knowledge infrastructure. See [the detailed architecture](docs/ARCHITECTURE.md).
 
 ## 📊 Evaluate with evidence
 
@@ -232,10 +232,15 @@ Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the man
 
 Each upstream project keeps its own license. Consult the corresponding repository before redistribution or modification.
 
+### Agent repository name
 
-## TimesFM SHADOW scenario
+The Kex-anHarness source repository is
+[devdownin/Kex-anHarness](https://github.com/devdownin/Kex-anHarness).
+`make components` checks it out under `.components/Kex-anHarness`. The published
+Docker image remains `compagnonsdudev/kex-agent-ai`; the Lab keeps the compatible
+image version pinned in `versions.env`.
 
-The optional [TimesFM end-to-end guide](docs/TIMESFM.md) builds pinned KafkaExplorer and
-Kex-agent-ai sources, records a real Kafka consumer time-lag metric in PostgreSQL, waits for
-512 real one-second buckets, then verifies a persisted CPU TimesFM SHADOW result and its process
-association. Start with `sh scripts/timesfm.sh prepare`; the standard Hub profile is unchanged.
+Existing `.components/Kex-agent-ai` checkouts are moved to `.components/Kex-anHarness`
+by `make components`, preserving local files and Git history. If both directories
+already exist, both are kept and the new one is used. The agent remote is updated
+to the new URL before the normal fast-forward-only update.

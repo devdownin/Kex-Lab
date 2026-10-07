@@ -7,7 +7,7 @@ Kex Lab treats integration points as contracts rather than implementation detail
 | traffic generator | Kafka | `demo.app.topic`, JSON, six partitions | scenario + topic inspection |
 | KafkaConsumerAutoTune | Kafka | bootstrap server + `demo.app.topic` | consumer lag |
 | Kafka SQL Explorer | Kafka | Kafka protocol, read/inspection access | liveness + inspection |
-| Kex Agent AI | Kafka SQL Explorer | HTTP MCP, token, read-only tools | agent tool trace |
+| Kex-anHarness | Kafka SQL Explorer | HTTP MCP, token, read-only tools | agent tool trace |
 | Optional review profile | Kafka SQL Explorer | `lab` topic policy, declared DLT source, persisted lag baseline | tool catalog and two complete lag readings |
 | Prometheus | Lab services | `/actuator/prometheus` where exposed | scrape target state |
 

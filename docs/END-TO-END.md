@@ -9,7 +9,7 @@ traffic generator
     Kafka 4.3 <--------- KafkaConsumerAutoTune
        |
        v
-Kafka SQL Explorer --MCP--> Kex Agent AI
+Kafka SQL Explorer --MCP--> Kex-anHarness
        ^
        |
  optional private AI / knowledge
