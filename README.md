@@ -239,3 +239,8 @@ Kex-anHarness is the new name of Kex Agent AI. Its source repository is
 `make components` checks it out under `.components/Kex-anHarness`. The published
 Docker image remains `compagnonsdudev/kex-agent-ai`; the Lab keeps the compatible
 image version pinned in `versions.env`.
+
+Existing `.components/Kex-agent-ai` checkouts are moved to `.components/Kex-anHarness`
+by `make components`, preserving local files and Git history. If both directories
+already exist, both are kept and the new one is used. The agent remote is updated
+to the new URL before the normal fast-forward-only update.
