@@ -1,0 +1,82 @@
+# Opt-in real TimesFM SHADOW scenario. Sources and model are pinned; see docs/TIMESFM.md.
+services:
+  history-db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: kex_history
+      POSTGRES_USER: kex_history
+      POSTGRES_PASSWORD: ${KEX_TIMESFM_DB_PASSWORD:?Run scripts/timesfm.sh prepare}
+    volumes:
+      - timesfm_history:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kex_history -d kex_history"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  timesfm:
+    build:
+      context: ./.timesfm/sources/Kafkaexplorer/services/timesfm
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=512m
+    volumes:
+      - timesfm_models:/models
+    environment:
+      TIMESFM_TOKEN: ${TIMESFM_TOKEN:?Run scripts/timesfm.sh prepare}
+      TIMESFM_CACHE_DIR: /models
+      TIMESFM_THREADS: "4"
+    cpus: 4.0
+    mem_limit: 8g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3).read()"]
+      interval: 15s
+      timeout: 5s
+      retries: 30
+      start_period: 5m
+    restart: unless-stopped
+
+  explorer:
+    image: kex-lab-timesfm-explorer:local
+    pull_policy: build
+    build:
+      context: ./.timesfm/sources/Kafkaexplorer
+    environment:
+      EXPLORER_FORECASTING_HISTORY_ENABLED: "true"
+      EXPLORER_FORECASTING_HISTORY_CLUSTER_ID: kex-lab-timesfm
+      EXPLORER_FORECASTING_HISTORY_COLLECTOR_ID: lab-explorer
+      EXPLORER_FORECASTING_HISTORY_JDBC_URL: jdbc:postgresql://history-db:5432/kex_history
+      EXPLORER_FORECASTING_HISTORY_USERNAME: kex_history
+      EXPLORER_FORECASTING_HISTORY_PASSWORD: ${KEX_TIMESFM_DB_PASSWORD:?Run scripts/timesfm.sh prepare}
+      EXPLORER_FORECASTING_HISTORY_METRIC_IDS: kex-lab-timesfm-lag
+      EXPLORER_FORECASTING_INFERENCE_ENABLED: "true"
+      EXPLORER_FORECASTING_INFERENCE_SERVICE_URL: http://timesfm:8000
+      EXPLORER_FORECASTING_INFERENCE_TOKEN: ${TIMESFM_TOKEN:?Run scripts/timesfm.sh prepare}
+      EXPLORER_FORECASTING_INFERENCE_TIMEOUT: 35s
+      EXPLORER_MCP_ALLOWED_FORECAST_ENVIRONMENTS: lab
+      EXPLORER_MCP_ALLOWED_GROUP_PREFIXES: kex-lab-timesfm-worker
+      EXPLORER_MCP_ALLOWED_TOPIC_PREFIXES: ${KEX_LAB_TOPIC:-demo.app.topic}
+      SPRING_CONFIG_ADDITIONAL_LOCATION: file:/etc/kex-lab/pilot.yml
+    volumes:
+      - ./.timesfm/pilot.yml:/etc/kex-lab/pilot.yml:ro
+      - timesfm_explorer:/app/data
+    depends_on:
+      history-db:
+        condition: service_healthy
+      timesfm:
+        condition: service_healthy
+
+  agent:
+    image: kex-lab-timesfm-agent:local
+    pull_policy: build
+    build:
+      context: ./.timesfm/sources/Kex-agent-ai
+    volumes:
+      - timesfm_agent:/var/lib/kex
+
+volumes:
+  timesfm_history:
+  timesfm_models:
+  timesfm_explorer:
+  timesfm_agent:

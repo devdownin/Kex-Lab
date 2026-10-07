@@ -231,3 +231,11 @@ Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the man
 ## 📄 Licenses
 
 Each upstream project keeps its own license. Consult the corresponding repository before redistribution or modification.
+
+
+## TimesFM SHADOW scenario
+
+The optional [TimesFM end-to-end guide](docs/TIMESFM.md) builds pinned KafkaExplorer and
+Kex-agent-ai sources, records a real Kafka consumer time-lag metric in PostgreSQL, waits for
+512 real one-second buckets, then verifies a persisted CPU TimesFM SHADOW result and its process
+association. Start with `sh scripts/timesfm.sh prepare`; the standard Hub profile is unchanged.
