@@ -105,7 +105,7 @@ Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-r
 KafkaExplorer now offers read-only MCP tools for topic configuration and
 environment-specific policy checks, comparisons of two complete consumer-lag
 readings, and DLQ reviews with declared source/retry/replay references. Kex-anHarness
-AI can use them while distinguishing measured Kafka evidence from configured
+can use them while distinguishing measured Kafka evidence from configured
 expectations. For the **one-broker Lab**, an optional profile declares a `lab`
 policy (one replica, one in-sync replica), maps the demo DLT to its source,
 and persists lag baselines in Explorer's `/app/data` volume:
@@ -162,15 +162,15 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 ## 🏗️ How it connects
 
 ```mermaid
-flowchart LR
-  K[(Kafka 4.3)] --> I[kafka-init]
-  I -->|create topics + seed records| K
-  K -->|topics / records| E[Kafka SQL Explorer]
-  K -->|consumer workload| T[KafkaConsumerAutoTune]
-  E -->|read-only MCP tools| A[Kex-anHarness]
-  A -->|optional local inference| S[SpectraLLM]
-  S -->|optional Kafka ingestion| K
-  T -. consumer state / metrics .-> K
+flowchart TD
+  I["kafka-init"] -->|create topics and seed records| K[("Kafka 4.3")]
+  K -->|topics and records| E["Kafka SQL Explorer"]
+  K -->|consumer workload| T["KafkaConsumerAutoTune"]
+  T -. consumer state and metrics .-> K
+  A["Kex-anHarness"] -->|read-only MCP calls| E
+  E -->|Kafka evidence| A
+  A -. optional local inference .-> S["SpectraLLM"]
+  S -. optional Kafka ingestion .-> K
 ```
 
 **Runtime boundaries:** Kafka is the shared event backbone; Explorer owns inspection and the read-only MCP evidence boundary; AutoTune consumes Kafka traffic and adapts its consumer settings; Kex-anHarness reasons over governed MCP evidence rather than receiving Kafka mutation rights; Spectra is optional local inference/knowledge infrastructure. See [the detailed architecture](docs/ARCHITECTURE.md).
@@ -234,7 +234,7 @@ Each upstream project keeps its own license. Consult the corresponding repositor
 
 ### Agent repository name
 
-Kex-anHarness is the new name of Kex Agent AI. Its source repository is
+The Kex-anHarness source repository is
 [devdownin/Kex-anHarness](https://github.com/devdownin/Kex-anHarness).
 `make components` checks it out under `.components/Kex-anHarness`. The published
 Docker image remains `compagnonsdudev/kex-agent-ai`; the Lab keeps the compatible
