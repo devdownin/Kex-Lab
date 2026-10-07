@@ -20,7 +20,7 @@ echo "────────────────────────�
 check "Docker Compose stack is readable" docker compose --env-file versions.env -f compose.yml config -q
 check "Kafka container is running" docker compose -f compose.yml exec -T kafka /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092
 check "Explorer health is UP" curl -fsS "http://127.0.0.1:${EXPLORER_PORT:-8080}/actuator/health/liveness"
-check "Kex Agent health is UP" curl -fsS "http://127.0.0.1:${KEX_AGENT_PORT:-8081}/actuator/health"
+check "Kex-anHarness health is UP" curl -fsS "http://127.0.0.1:${KEX_AGENT_PORT:-8081}/actuator/health"
 
 echo "────────────────────────────────"
 printf 'Result: %s passed, %s failed\n' "$pass" "$fail"

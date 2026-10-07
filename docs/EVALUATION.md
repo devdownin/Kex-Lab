@@ -8,9 +8,9 @@ The goal is to get useful evidence quickly, then deepen only the component you n
 2. Replace the two development tokens in `.env`.
 3. Run `make up`.
 4. Run `make smoke`.
-5. Open Explorer on http://localhost:8080 and Kex Agent on http://localhost:8081.
+5. Open Explorer on http://localhost:8080 and Kex-anHarness on http://localhost:8081.
 6. In Explorer, verify the broker is reachable and inspect topics.
-7. If an LLM key is configured, ask Kex Agent to list Kafka topics. The useful evidence is not only the answer: verify that the conversation reports an MCP tool call.
+7. If an LLM key is configured, ask Kex-anHarness to list Kafka topics. The useful evidence is not only the answer: verify that the conversation reports an MCP tool call.
 
 Success criteria:
 
@@ -84,7 +84,7 @@ The target demonstration is an observable business flow in Kafka where:
 1. traffic is produced;
 2. AutoTune consumes it and adapts under changing load;
 3. Explorer exposes the actual Kafka state and traces;
-4. Kex Agent diagnoses the situation using Explorer MCP evidence;
+4. Kex-anHarness diagnoses the situation using Explorer MCP evidence;
 5. optional SpectraLLM supplies private domain knowledge/local inference;
 6. every automated conclusion can be traced back to observations.
 

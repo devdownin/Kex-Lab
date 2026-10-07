@@ -15,7 +15,7 @@ clone_or_update() {
   fi
 }
 
-clone_or_update Kex-agent-ai https://github.com/devdownin/Kex-agent-ai.git
+clone_or_update Kex-anHarness https://github.com/devdownin/Kex-anHarness.git
 clone_or_update Kafkaexplorer https://github.com/devdownin/Kafkaexplorer.git
 clone_or_update kafkaconsumerautotune https://github.com/devdownin/kafkaconsumerautotune.git
 clone_or_update SpectraLLM https://github.com/devdownin/SpectraLLM.git

@@ -2,7 +2,7 @@
 
 KafkaExplorer exposes four read-only MCP reviews: topic configuration,
 `kex_topic_policy_review`, `kex_consumer_lag_trend` and `kex_dlq_review`.
-Kex Agent AI has guidance for interpreting their evidence, missing policies and
+Kex-anHarness has guidance for interpreting their evidence, missing policies and
 declarations. This Lab provides an **optional** configuration for its single broker.
 
 ## Image compatibility
@@ -12,7 +12,7 @@ declarations. This Lab provides an **optional** configuration for its single bro
 and [`compagnonsdudev/kex-agent-ai:0.9.16`](https://hub.docker.com/r/compagnonsdudev/kex-agent-ai/tags?name=0.9.16).
 These releases include the operational review changes
 ([Explorer PR #426](https://github.com/devdownin/Kafkaexplorer/pull/426),
-[Agent PR #129](https://github.com/devdownin/Kex-agent-ai/pull/129)).
+[Agent PR #129](https://github.com/devdownin/Kex-anHarness/pull/129)).
 Confirm `kex_topic_policy_review`, `kex_consumer_lag_trend` and
 `kex_dlq_review` in Explorer's **MCP** tool catalog after starting the profile.
 You can override either tag through `EXPLORER_IMAGE` and `KEX_AGENT_IMAGE` in
@@ -44,7 +44,7 @@ names come from `versions.env` and can be overridden in `.env`.
 
 ## Ask and inspect evidence
 
-| Ask Kex Agent AI | Explorer tool | What to verify |
+| Ask Kex-anHarness | Explorer tool | What to verify |
 |---|---|---|
 | “Does demo.app.topic meet the **lab** topic policy?” | `kex_topic_policy_review` | Measured replica/ISR counts and cleanup policy. An absent policy is `NOT_CONFIGURED`, never compliance. |
 | “Is the consumer group on demo.app.topic falling behind since the last reading?” | `kex_consumer_lag_trend` | Supply an actual group ID from Explorer. Repeat after a second complete reading; missing baseline or offset resets mean the rate is unmeasured. |
@@ -60,7 +60,7 @@ Explorer tool call; it needs a configured model provider and Python 3.
 The MCP path is read-only. Neither the agent nor the review tool replays a
 record. The definitions, scopes and limitations are documented in
 [KafkaExplorer's deployment reference](https://github.com/devdownin/Kafkaexplorer/blob/main/docs/DOCKERHUB-OPERATIONS.md#operational-mcp-reviews)
-and the [agent MCP guide](https://github.com/devdownin/Kex-agent-ai/blob/main/docs/MCP.md).
+and the [agent MCP guide](https://github.com/devdownin/Kex-anHarness/blob/main/docs/MCP.md).
 
 Run `make down` to stop the core services while keeping the lag volume. `make
 reset` deletes **all** Lab volumes, including broker data and the saved lag

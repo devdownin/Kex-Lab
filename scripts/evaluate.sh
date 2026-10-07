@@ -33,7 +33,7 @@ case "$TARGET" in
   agent)
     ensure_components
     echo "Use 'make up' for the pre-wired Agent + Explorer evaluation."
-    echo "Upstream checkout: $ROOT/.components/Kex-agent-ai"
+    echo "Upstream checkout: $ROOT/.components/Kex-anHarness"
     ;;
   all)
     echo "Run the evaluation paths independently to avoid port and infrastructure collisions:"

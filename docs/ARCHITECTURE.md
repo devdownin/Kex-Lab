@@ -12,7 +12,7 @@ flowchart LR
     I -->|create topics + seed records| K
     K -->|bootstrap kafka:29092| E[Kafka SQL Explorer]
     K -->|consumer workload| T[KafkaConsumerAutoTune]
-    E -->|read-only MCP tools| A[Kex Agent AI]
+    E -->|read-only MCP tools| A[Kex-anHarness]
     A -->|optional inference / RAG| S[SpectraLLM API]
     SF[Spectra frontend] --> S
     S --> C[(ChromaDB)]
@@ -45,7 +45,7 @@ Lab's single broker and are not production defaults.
 | Event backbone | Kafka | Shared event stream used as the reference integration |
 | Evidence and exploration | Kafka SQL Explorer | Topics, SQL, schemas, tracing, audits and read-only MCP |
 | Adaptive execution | KafkaConsumerAutoTune | Consumer throughput adaptation, resilience and observability |
-| Governed reasoning | Kex Agent AI | Tool selection, supervision, policy, approvals and audit |
+| Governed reasoning | Kex-anHarness | Tool selection, supervision, policy, approvals and audit |
 | Private AI knowledge | SpectraLLM | Local RAG, ingestion, fine-tuning and model deployment |
 
 ## Diagnosis path
@@ -53,7 +53,7 @@ Lab's single broker and are not production defaults.
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant A as Kex Agent
+    participant A as Kex-anHarness
     participant E as Kafka SQL Explorer
     participant K as Kafka
     U->>A: operational question
