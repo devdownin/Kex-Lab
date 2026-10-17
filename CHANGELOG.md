@@ -4,6 +4,15 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 
 ## Unreleased
 
+### Added
+- Task-grouped `make help` as the default command, with a CLI walkthrough.
+- Actionable, read-only preflight checks for tools, Docker resources, configuration and demo ports; credential values remain hidden.
+- Five-step lightweight demo with elapsed time, live progress, concise failure diagnostics, `--verbose` logs and discovered interface URLs.
+
+### Changed
+- Readiness retries show elapsed time and final diagnostic details; verbose mode shows every probe.
+- The isolated Kafka integration smoke now exercises the public lightweight demo before the DLT assertion.
+
 ## 0.1.0 — 2026-10-17
 
 ### Added

@@ -1,0 +1,35 @@
+Kex Lab — choose your next step
+
+START
+  make setup                 Create .env without replacing existing settings
+  make doctor                Check prerequisites and get corrective actions
+  make demo-lite             Guided Kafka demo, no Spectra/model download
+  make demo                  Full stack, including optional model downloads
+
+TEST
+  make check                 Repository checks; starts no containers
+  make scenario-assert       Assert new Kafka records (SCENARIO=basic|dlt|lag|overload)
+  make integration-smoke     Isolated Kafka integration test; cleans its own data
+
+OBSERVE
+  make health PROFILE=demo   Check containers, Kafka and HTTP endpoints
+  make report PROFILE=demo   Write reports/latest.md and reports/latest.json
+  make observability-up      Start Prometheus and the provisioned Grafana dashboard
+
+DIAGNOSE
+  make status                Inspect the core Compose services
+  make logs                  Follow core service logs (Ctrl+C to stop following)
+  make wait PROFILE=demo     Wait for an already running stack to become healthy
+  make doctor ARGS=--verbose Show detailed prerequisite diagnostics
+
+STOP
+  make demo-lite-down        Stop the lightweight stack; keep Kafka data
+  make down                  Stop the core stack; keep Kafka data
+  make hub-down              Stop the full stack; keep Kafka data
+  make observability-down    Stop the observability stack; keep Kafka data
+  make reset                 WARNING: delete core/operational-review volumes and data
+
+Verbose output: make demo-lite ARGS=--verbose or make wait ARGS=--verbose
+Profiles: core | ai (default) | reviews | demo | full | observability
+First run: make setup, make doctor, then make demo-lite.
+Configuration and walkthrough: README.md and docs/CLI.md

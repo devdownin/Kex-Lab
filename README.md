@@ -43,7 +43,12 @@ Kex Lab is an integration and evaluation repository. The four products remain in
 
 > **Goal:** get the published Kex applications running together around a shared Kafka broker.
 
-**Requirements:** Docker Engine with Compose v2, Make, a POSIX shell and curl. Python 3 is needed for repository checks, scenario assertions and Agent end-to-end assertions.
+**Requirements:** Docker Engine with Compose v2, Make, a POSIX shell, curl and Python 3.
+
+Run `make` or `make help` for commands grouped by task; neither starts services.
+For a first run, use `make setup` then `make doctor`. Doctor checks prerequisites,
+Docker resources, configuration and ports, and suggests a correction for each
+problem. [Command-line guide](docs/CLI.md).
 
 ### Lightweight guided demo
 
@@ -51,10 +56,16 @@ Kex Lab is an integration and evaluation repository. The four products remain in
 make demo-lite
 ```
 
-This starts Kafka, Explorer, AutoTune and the Agent, waits for the `demo` profile,
-verifies one traffic injection and writes `reports/latest.md` plus
-`reports/latest.json`. It requires no Spectra model download. A provider key is
-needed only for an actual Agent reasoning/tool-call evaluation.
+Follow five numbered steps: prerequisites, startup, readiness, exact Kafka
+traffic assertion and runtime report. Long operations show elapsed time; the
+final summary links to Explorer, AutoTune and the Agent, and offers Grafana as
+an optional next step. Reports are saved as `reports/latest.md` and
+`reports/latest.json`. Add `ARGS=--verbose` to stream detailed logs. A failed
+step shows its diagnostic output and stops the walkthrough.
+
+This starts Kafka, Explorer, AutoTune and the Agent without Spectra or model
+downloads. A provider key is needed only for an actual Agent reasoning/tool-call
+evaluation. Stop with `make demo-lite-down` to preserve Kafka data.
 
 As a starting workstation budget, allocate **4 CPUs, 8 GB RAM and 10 GB free
 disk** to Docker; this is a planning recommendation, not a benchmark guarantee.

@@ -1,8 +1,11 @@
 SHELL := /bin/sh
-.DEFAULT_GOAL := setup
+.DEFAULT_GOAL := help
 COMPOSE := docker compose --env-file versions.env --env-file .env -f compose.yml
 
-.PHONY: observability-smoke demo-lite demo-lite-down release-prepare check setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-reviews profile-full profile-demo integration-smoke scenario-assert agent-e2e
+.PHONY: help observability-smoke demo-lite demo-lite-down release-prepare check setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-reviews profile-full profile-demo integration-smoke scenario-assert agent-e2e
+
+help:
+	@cat docs/CLI-HELP.txt
 
 check:
 	sh scripts/check.sh
@@ -36,7 +39,7 @@ evaluate:
 	sh scripts/evaluate.sh all
 
 demo-lite: setup
-	sh scripts/demo-lite.sh
+	@sh scripts/demo-lite.sh $(ARGS)
 
 demo-lite-down:
 	$(COMPOSE) -f compose.autotune.yml down
@@ -54,10 +57,10 @@ demo-down:
 	docker compose --env-file versions.env --env-file .env -f compose.yml -f compose.autotune.yml -f compose.hub.yml down
 
 doctor:
-	sh scripts/doctor.sh
+	@sh scripts/doctor.sh $(ARGS)
 
 wait:
-	KEX_LAB_HEALTH_PROFILE=$(or $(PROFILE),ai) sh scripts/wait-ready.sh
+	@KEX_LAB_HEALTH_PROFILE=$(or $(PROFILE),ai) sh scripts/wait-ready.sh $(ARGS)
 
 report:
 	sh scripts/report.sh $(or $(PROFILE),ai)
