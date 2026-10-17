@@ -21,8 +21,9 @@ The output contains:
 - `release-notes.md`: human-readable notes with the exact image set;
 - `SHA256SUMS`: hashes for the four files above.
 
-Preparation does not create a Git tag or publish a GitHub release. A candidate
-can be reviewed as part of its PR before publishing.
+Preparation does not create a Git tag or publish a GitHub release. CI uploads
+the same exact-head assets as `kex-lab-release-candidate` on the PR validation
+run so they can be downloaded and reviewed before publishing.
 
 ## Publish after merging
 
