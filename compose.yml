@@ -62,7 +62,7 @@ services:
       kafka-init:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8080/actuator/health/liveness | grep -q '\"status\":\"UP\"'"]
+      test: ["CMD-SHELL", "wget -Y off -q -O - http://127.0.0.1:8080/actuator/health/liveness | grep -q '\"status\":\"UP\"'"]
       interval: 15s
       timeout: 5s
       retries: 12

@@ -11,6 +11,8 @@ jobs:
   fresh-clone:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      COMPOSE_PROJECT_NAME: kex-lab-fresh-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
       - name: Configure clean environment

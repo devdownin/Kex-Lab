@@ -2,20 +2,11 @@
 
 This scenario demonstrates the operational chain shared by three of the four projects without duplicating their source trees.
 
-```text
-traffic generator
-       |
-       v
-    Kafka 4.3 <--------- KafkaConsumerAutoTune
-       |
-       v
-Kafka SQL Explorer --MCP--> Kex-anHarness
-       ^
-       |
- optional private AI / knowledge
-       |
-   SpectraLLM
-```
+![Kex Lab architecture: demo traffic enters Apache Kafka; Explorer inspects Kafka evidence; AutoTune consumes traffic; Kex-anHarness calls Explorer through read-only MCP tools; SpectraLLM provides optional local inference and knowledge.](assets/kex-lab-architecture.png)
+
+Traffic flows into Kafka, AutoTune consumes it, and Explorer exposes the broker
+as read-only MCP evidence for Kex-anHarness. The dashed SpectraLLM path is an
+optional integration requiring explicit configuration.
 
 ## Run
 
@@ -28,6 +19,18 @@ make demo
 Compose first runs the one-shot `kafka-init` service. It creates `demo.app.topic` and `demo.app.topic.dlt` (six partitions by default) and seeds `demo.app.topic` with 500 deterministic JSON records by default. Kafka-dependent services then start after successful initialization. Values can be changed through `KEX_LAB_TOPIC`, `KEX_LAB_DLT_TOPIC`, `KEX_LAB_PARTITIONS` and `KEX_LAB_MESSAGES`.
 
 AutoTune is launched with its `dev` profile and H2 persistence, so the Lab does not require the Oracle XE stack merely to demonstrate Kafka consumption and tuning. Its image normally waits for Oracle in its entrypoint; the Lab overrides that entrypoint for this H2 evaluation profile.
+
+## Verify each injection
+
+`SCENARIO=basic make scenario-assert` captures offsets before and after one
+traffic run and requires exactly the configured number of new records across
+all partitions. `SCENARIO=dlt make scenario-assert` additionally finds a poison
+record among the newly appended records. Existing backlog or historical poison
+records cannot satisfy these checks. Run with no other producer writing to the
+same topic; concurrent writes fail the exact-count assertion.
+
+Use `make health PROFILE=demo` to check this Kafka/Explorer/Agent/AutoTune stack.
+Use `make health PROFILE=full` when Spectra is also running.
 
 ## Observe
 

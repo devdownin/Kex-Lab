@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
 
   spectra-api:
-    image: ${SPECTRALLM_IMAGE:-compagnonsdudev/spectrallm:latest}
+    image: ${SPECTRALLM_IMAGE:-compagnonsdudev/spectrallm@sha256:b8c5fc4a910a46180cabfc9b5997306629032c3c4a7e4bb3acaf7ca1154de1fc}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${SPECTRA_API_PORT:-8083}:8080"
     environment:
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   spectra-frontend:
-    image: ${SPECTRALLM_FRONTEND_IMAGE:-compagnonsdudev/spectrallm-frontend:latest}
+    image: ${SPECTRALLM_FRONTEND_IMAGE:-compagnonsdudev/spectrallm-frontend@sha256:77c6198d231d89baee2e8a51939f74f308490eb41815c599f0ac07d54fb45a81}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${SPECTRA_FRONTEND_PORT:-8084}:80"
     depends_on:

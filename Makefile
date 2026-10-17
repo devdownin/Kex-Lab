@@ -1,7 +1,11 @@
 SHELL := /bin/sh
+.DEFAULT_GOAL := setup
 COMPOSE := docker compose --env-file versions.env --env-file .env -f compose.yml
 
-.PHONY: setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-reviews profile-full profile-demo integration-smoke scenario-assert agent-e2e
+.PHONY: check setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-reviews profile-full profile-demo integration-smoke scenario-assert agent-e2e
+
+check:
+	sh scripts/check.sh
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -20,7 +24,7 @@ status:
 	sh scripts/status.sh
 
 smoke:
-	sh scripts/smoke-test.sh
+	sh scripts/smoke-test.sh $(or $(PROFILE),ai)
 
 logs:
 	$(COMPOSE) logs -f
@@ -44,13 +48,13 @@ doctor:
 	sh scripts/doctor.sh
 
 wait:
-	sh scripts/wait-ready.sh
+	KEX_LAB_HEALTH_PROFILE=$(or $(PROFILE),ai) sh scripts/wait-ready.sh
 
 report:
 	sh scripts/report.sh
 
 health:
-	sh scripts/health.sh
+	sh scripts/health.sh $(or $(PROFILE),ai)
 
 demo-basic: setup
 	sh scripts/scenario.sh basic

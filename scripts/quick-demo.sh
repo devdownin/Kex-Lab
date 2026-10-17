@@ -12,7 +12,7 @@ echo "Injecting the reproducible basic Kafka scenario..."
 sh scripts/scenario.sh basic
 
 echo
-sh scripts/health.sh
+sh scripts/health.sh full
 echo
 echo "Kex Lab demo is ready:"
 echo "  Explorer : http://localhost:${EXPLORER_PORT:-8080}"

@@ -11,9 +11,12 @@ case "$delay" in
 esac
 i=1
 while [ "$i" -le "$attempts" ]; do
-  if sh scripts/smoke-test.sh; then
+  if sh scripts/smoke-test.sh "${3:-${KEX_LAB_HEALTH_PROFILE:-ai}}"; then
     echo "Kex Lab ready after attempt $i/$attempts"
     exit 0
+  else
+    status=$?
+    [ "$status" -ne 2 ] || exit 2
   fi
   echo "Waiting for Kex Lab ($i/$attempts)..."
   if [ "$i" -lt "$attempts" ]; then sleep "$delay"; fi
