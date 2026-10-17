@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-cd "$ROOT"
-[ -f .env ] && set -a && . ./.env && set +a
+. "$(dirname -- "$0")/common.sh"
 
 check() {
   name="$1"; url="$2"; version="$3"

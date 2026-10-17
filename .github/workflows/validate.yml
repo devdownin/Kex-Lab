@@ -31,7 +31,7 @@ jobs:
             sh -n "$script"
           done
 
-      - name: Validate TimesFM scenario contracts
+      - name: Validate script and TimesFM contracts
         run: |
           python3 -m py_compile scripts/timesfm-demo.py
-          python3 -m unittest discover -s tests -p 'test_timesfm_demo.py' -v
+          python3 -m unittest discover -s tests -p 'test_*.py' -v

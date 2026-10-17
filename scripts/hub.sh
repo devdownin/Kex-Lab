@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-cd "$ROOT"
-[ -f .env ] && set -a && . ./.env && set +a
+. "$(dirname -- "$0")/common.sh"
 COMPOSE="docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml -f compose.hub.yml"
 case "${1:-up}" in
  pull) $COMPOSE pull ;;

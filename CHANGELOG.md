@@ -13,6 +13,13 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 - Compatibility manifest in `versions.env`.
 - Optional operational review profile for compatible KafkaExplorer and Kex-anHarness images: single-broker `lab` topic policy, declared demo DLT source, and persisted lag baselines. The Agent end-to-end check now uses its current authenticated chat API and checks a real MCP tool invocation.
 
+### Fixed
+- Preserve exported configuration overrides across Lab scripts; load the image manifest for health and runtime commands.
+- Keep scenario-specific traffic defaults despite the example `.env`, honor custom topic/partition settings, and use custom counts in assertions.
+- Stop the guided demo on readiness failure; allow readiness checks from any working directory and validate retry arguments.
+- Pass Make scenario selections correctly and apply local `.env` settings to Compose commands.
+- Align setup, Spectra, observability and validation documentation with the implemented workflows; run shell regression contracts in CI.
+
 ### Changed
 - Update Kex-anHarness names, source links and component checkout paths after the GitHub repository rename; retain the existing Docker image references.
 - Pin the published KafkaExplorer `2.1.1` and Kex-anHarness `0.9.16` Docker Hub tags in the compatibility manifest and Compose defaults for the operational review profile.

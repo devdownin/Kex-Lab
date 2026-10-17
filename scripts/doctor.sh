@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 set -u
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-cd "$ROOT"
-[ -f .env ] && set -a && . ./.env && set +a
+. "$(dirname -- "$0")/common.sh"
 fail=0; warn=0
 ok(){ printf '✓ %s\n' "$1"; }
 bad(){ printf '✗ %s\n' "$1"; fail=$((fail+1)); }

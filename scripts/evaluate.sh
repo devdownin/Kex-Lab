@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+. "$(dirname -- "$0")/common.sh"
 TARGET="${1:-all}"
 
 ensure_components() {
@@ -10,8 +10,8 @@ ensure_components() {
 case "$TARGET" in
   core)
     cd "$ROOT"
-    docker compose -f compose.yml up -d
-    sh "$ROOT/scripts/smoke-test.sh"
+    docker compose --env-file versions.env -f compose.yml up -d
+    sh "$ROOT/scripts/wait-ready.sh"
     ;;
   explorer)
     ensure_components
