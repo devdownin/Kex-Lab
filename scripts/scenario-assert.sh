@@ -43,7 +43,7 @@ if [ "$SCENARIO" = dlt ]; then
   while read -r partition start count; do
     $COMPOSE exec -T kafka /opt/kafka/bin/kafka-console-consumer.sh \
       --bootstrap-server kafka:29092 --topic "$TOPIC" --partition "$partition" \
-      --offset "$start" --max-messages "$count" --timeout-ms 10000 >> "$work/sample"
+      --offset "$start" --max-messages "$count" --timeout-ms 10000 >> "$work/sample" < /dev/null
   done < "$work/ranges"
   grep -qx 'not-json-poison-message' "$work/sample" || { echo 'ASSERT FAILED: no new poison record found.' >&2; exit 1; }
   echo "ASSERT PASS: a new invalid source record is observable in $TOPIC."

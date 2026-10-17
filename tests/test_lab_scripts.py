@@ -38,9 +38,17 @@ if 'run' in args and 'traffic' in args:
         state.write_text(str(count))
 if 'kafka-get-offsets.sh' in ' '.join(args):
     if os.getenv('FAIL_OFFSETS'): sys.exit(1)
-    print(os.getenv('KEX_LAB_TOPIC', 'demo.app.topic') + ':0:' + str(count))
+    topic = os.getenv('KEX_LAB_TOPIC', 'demo.app.topic')
+    if os.getenv('MULTI_PARTITION'):
+        print(topic + ':0:' + str(2000 + max(0, count - 2001)))
+        print(topic + ':1:' + str(2000 + int(count > 2000)))
+    else:
+        print(topic + ':0:' + str(count))
 if 'kafka-console-consumer.sh' in ' '.join(args):
-    print('valid-json' if os.getenv('MISSING_POISON') else 'not-json-poison-message')
+    partition = args[args.index('--partition') + 1]
+    valid = os.getenv('MISSING_POISON') or (os.getenv('MULTI_PARTITION') and partition == '0')
+    print('valid-json' if valid else 'not-json-poison-message')
+    sys.stdin.read()  # Interactive docker exec can drain the caller's loop input.
 if 'port' in args:
     print('127.0.0.1:18080')
 if 'ps' in args and '-q' in args:
@@ -190,3 +198,11 @@ print('{"status":"DOWN"}' if os.getenv('HTTP_DOWN') else '{"status":"UP"}')
         result = self.run_script('wait-ready.sh', '30', '5', 'typo')
         self.assertEqual(result.returncode, 2)
         self.assertNotIn('Waiting for', result.stdout)
+
+    def test_dlt_checks_later_partitions_when_docker_reads_stdin(self):
+        result = self.run_script('scenario-assert.sh', 'dlt', KEX_LAB_MESSAGES='3',
+                                 MULTI_PARTITION='1')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        consumers = [c for c in self.calls()
+                     if 'kafka-console-consumer.sh' in ' '.join(c['args'])]
+        self.assertEqual(len(consumers), 2)
