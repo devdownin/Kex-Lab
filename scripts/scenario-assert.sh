@@ -28,8 +28,8 @@ trap 'rm -rf "$work"' EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 get_offsets() {
-  $COMPOSE exec -T kafka /opt/kafka/bin/kafka-run-class.sh kafka.tools.GetOffsetShell \
-    --broker-list kafka:29092 --topic "$TOPIC"
+  $COMPOSE exec -T kafka /opt/kafka/bin/kafka-get-offsets.sh \
+    --bootstrap-server kafka:29092 --time -1 --topic "$TOPIC"
 }
 get_offsets > "$work/before"
 $COMPOSE run --rm traffic

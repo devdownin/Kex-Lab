@@ -36,7 +36,7 @@ if 'run' in args and 'traffic' in args:
         count += int(os.environ.get('KEX_LAB_MESSAGES', '500'))
         count += os.environ.get('KEX_LAB_INJECT_INVALID') == 'true'
         state.write_text(str(count))
-if 'kafka.tools.GetOffsetShell' in args:
+if 'kafka-get-offsets.sh' in ' '.join(args):
     if os.getenv('FAIL_OFFSETS'): sys.exit(1)
     print(os.getenv('KEX_LAB_TOPIC', 'demo.app.topic') + ':0:' + str(count))
 if 'kafka-console-consumer.sh' in ' '.join(args):

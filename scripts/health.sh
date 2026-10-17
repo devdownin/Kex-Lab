@@ -54,7 +54,7 @@ case "$profile" in
 esac
 case "$profile" in
   demo|full|observability)
-    check 'AutoTune dashboard' http_ready "${KEX_LAB_AUTOTUNE_URL:-http://127.0.0.1:${AUTOTUNE_PORT:-8082}}/dashboard"
+    check 'AutoTune health' actuator_ready "${KEX_LAB_AUTOTUNE_URL:-http://127.0.0.1:${AUTOTUNE_PORT:-8082}}/actuator/health"
     ;;
 esac
 if [ "$profile" = full ]; then
