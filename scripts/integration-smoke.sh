@@ -21,14 +21,13 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 echo "Isolated integration project: $COMPOSE_PROJECT_NAME"
-$COMPOSE up -d kafka explorer agent autotune
-# Discover the ephemeral host ports for HTTP probes. Nested scripts keep this project.
+# Exercise the public guided path, with one explicitly measured injection.
+KEX_LAB_MESSAGES=25 sh scripts/demo-lite.sh
+# The subsequent DLT check and report keep the isolated project's URLs.
 KEX_LAB_EXPLORER_URL="http://$($COMPOSE port explorer 8080)"
 KEX_LAB_AGENT_URL="http://$($COMPOSE port agent 8081)"
 KEX_LAB_AUTOTUNE_URL="http://$($COMPOSE port autotune 8080)"
 export KEX_LAB_EXPLORER_URL KEX_LAB_AGENT_URL KEX_LAB_AUTOTUNE_URL
-KEX_LAB_HEALTH_PROFILE=demo sh scripts/wait-ready.sh
-KEX_LAB_MESSAGES=25 sh scripts/scenario-assert.sh basic
 KEX_LAB_MESSAGES=3 sh scripts/scenario-assert.sh dlt
 
 sh scripts/report.sh demo

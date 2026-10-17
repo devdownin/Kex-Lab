@@ -30,6 +30,10 @@ with open(os.environ['CALL_LOG'], 'a') as log:
     log.write(json.dumps({'tool': 'docker', 'args': args, 'project': os.getenv('COMPOSE_PROJECT_NAME'), 'ports': [os.getenv(k) for k in ['KAFKA_PORT', 'EXPLORER_PORT', 'KEX_AGENT_PORT', 'AUTOTUNE_PORT']], 'messages': os.getenv('KEX_LAB_MESSAGES'), 'topic': os.getenv('KEX_LAB_TOPIC'), 'image': os.getenv('EXPLORER_IMAGE')}) + '\\n')
 state = Path(os.environ['CALL_LOG'] + '.offset')
 count = int(state.read_text()) if state.exists() else 2000
+if args and args[0] == 'info':
+    if os.getenv('FAIL_DAEMON'): sys.exit(1)
+    print(os.getenv('DOCTOR_RESOURCES', '4 8589934592'))
+if 'config' in args and os.getenv('FAIL_CONFIG'): sys.exit(1)
 if 'run' in args and 'traffic' in args:
     if os.getenv('FAIL_TRAFFIC'): sys.exit(1)
     if not os.getenv('NO_PRODUCE'):
@@ -216,6 +220,12 @@ print('{"status":"DOWN"}' if os.getenv('HTTP_DOWN') else '{"status":"UP"}')
         data = json.loads((self.root / 'reports/latest.json').read_text())
         self.assertEqual(data['profile'], 'demo')
         self.assertEqual(data['assertions'][0]['status'], 'PASS')
+        self.assertIn('[1/5]', result.stdout)
+        self.assertIn('[5/5]', result.stdout)
+        self.assertIn('exactly 500 new records', result.stdout)
+        self.assertIn('http://127.0.0.1:18080/dashboard', result.stdout)
+        self.assertIn('Grafana is optional', result.stdout)
+        self.assertNotIn('Container', result.stdout)
 
     def test_lightweight_demo_stops_if_no_new_traffic_is_observed(self):
         result = self.run_script('demo-lite.sh', NO_PRODUCE='1')
@@ -223,3 +233,56 @@ print('{"status":"DOWN"}' if os.getenv('HTTP_DOWN') else '{"status":"UP"}')
         self.assertNotIn('Lightweight demo ready', result.stdout)
         evidence = [json.loads(path.read_text()) for path in (self.root / 'reports/assertions').glob('*.json')]
         self.assertEqual([entry['status'] for entry in evidence], ['FAIL'])
+
+    def test_doctor_errors_have_actions_and_do_not_start_services(self):
+        result = self.run_script('doctor.sh', '--verbose', FAIL_DAEMON='1')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('Start Docker', result.stdout)
+        self.assertNotIn('make demo-lite. Warnings', result.stdout)
+        self.assertFalse(any('up' in call['args'] or 'down' in call['args'] for call in self.calls()))
+
+    def test_doctor_resources_are_warnings_and_secrets_are_redacted(self):
+        result = self.run_script('doctor.sh', '--verbose', DOCTOR_RESOURCES='2 4294967296',
+                                 KEX_AGENT_API_KEY='private-agent-value', EXPLORER_MCP_AUTH_TOKEN='private-mcp-value')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('WARN  Docker CPU', result.stdout)
+        self.assertIn('WARN  Docker RAM', result.stdout)
+        self.assertNotIn('private-agent-value', result.stdout + result.stderr)
+        self.assertNotIn('private-mcp-value', result.stdout + result.stderr)
+
+    def test_doctor_missing_config_and_invalid_ports_fail(self):
+        for settings in [{'FAIL_CONFIG': '1'}, {'KAFKA_PORT': '99999'},
+                         {'KAFKA_PORT': '8080'}]:
+            with self.subTest(settings=settings):
+                result = self.run_script('doctor.sh', **settings)
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn('Next:', result.stdout)
+        (self.root / '.env').unlink()
+        result = self.run_script('doctor.sh')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('make setup', result.stdout)
+        self.assertFalse((self.root / '.env').exists())
+
+    def test_demo_preflight_failure_stops_before_startup(self):
+        result = self.run_script('demo-lite.sh', FAIL_DAEMON='1')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn('[2/5]', result.stdout)
+        self.assertFalse(any('up' in call['args'] for call in self.calls()))
+
+    def test_demo_verbose_shows_assertions_and_rejects_unknown_flags(self):
+        result = self.run_script('demo-lite.sh', '--verbose')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('ASSERT PASS:', result.stdout)
+        result = self.run_script('demo-lite.sh', '--typo')
+        self.assertEqual(result.returncode, 2)
+
+    def test_wait_quiet_retry_and_verbose_failure_details(self):
+        script = self.root / 'scripts' / 'smoke-test.sh'
+        script.write_text('echo probe-details; exit 1\n')
+        result = self.run_script('wait-ready.sh', '2', '0', 'demo')
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout.count('probe-details'), 1)
+        self.assertIn('make health PROFILE=demo', result.stderr)
+        result = self.run_script('wait-ready.sh', '2', '0', 'demo', '--verbose')
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stdout.count('probe-details'), 2)
