@@ -1,0 +1,21 @@
+name: Observability Smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  observability-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: make observability-smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: observability-evidence
+          path: reports/

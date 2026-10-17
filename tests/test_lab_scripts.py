@@ -206,3 +206,20 @@ print('{"status":"DOWN"}' if os.getenv('HTTP_DOWN') else '{"status":"UP"}')
         consumers = [c for c in self.calls()
                      if 'kafka-console-consumer.sh' in ' '.join(c['args'])]
         self.assertEqual(len(consumers), 2)
+
+    def test_lightweight_demo_starts_only_core_and_autotune_and_reports_evidence(self):
+        result = self.run_script('demo-lite.sh')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = [c for c in self.calls() if c['tool'] == 'docker']
+        self.assertTrue(any('up' in c['args'] and 'autotune' in c['args'] for c in calls))
+        self.assertFalse(any('spectra' in ' '.join(c['args']) or 'compose.hub.yml' in c['args'] for c in calls))
+        data = json.loads((self.root / 'reports/latest.json').read_text())
+        self.assertEqual(data['profile'], 'demo')
+        self.assertEqual(data['assertions'][0]['status'], 'PASS')
+
+    def test_lightweight_demo_stops_if_no_new_traffic_is_observed(self):
+        result = self.run_script('demo-lite.sh', NO_PRODUCE='1')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('Lightweight demo ready', result.stdout)
+        evidence = [json.loads(path.read_text()) for path in (self.root / 'reports/assertions').glob('*.json')]
+        self.assertEqual([entry['status'] for entry in evidence], ['FAIL'])

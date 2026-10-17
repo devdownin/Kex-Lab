@@ -1,0 +1,17 @@
+---
+title: Kex Lab — integration architecture
+---
+flowchart LR
+  P[Demo traffic] -->|Produce events| K[(Apache Kafka)]
+  K -->|Kafka evidence| E[Kafka SQL Explorer]
+  K -->|Consumer workload| T[KafkaConsumerAutoTune]
+  A[Kex-anHarness] -->|Read-only MCP tools| E
+  S[SpectraLLM] -. Optional integration .-> A
+  classDef broker fill:#143754,color:#fff,stroke:#143754
+  classDef observe fill:#effcf9,color:#103751,stroke:#6acbc0
+  classDef adapt fill:#eff7ff,color:#103751,stroke:#85b9ef
+  classDef ai fill:#f5f2ff,color:#103751,stroke:#b9a7f5
+  class K broker
+  class E observe
+  class T adapt
+  class A,S ai

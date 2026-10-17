@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Kex Lab — Kafka operations, connected</title>
+  <desc id="description">Demo traffic enters Apache Kafka. Explorer inspects Kafka evidence and AutoTune consumes events. Kex-anHarness invokes Explorer's read-only MCP tools. SpectraLLM is an optional integration for local inference and knowledge.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 9 5 0 10" fill="none" stroke="#42607e" stroke-width="1.5"/></marker>
+    <linearGradient id="navy" x2="1" y2="1"><stop stop-color="#15344e"/><stop offset="1" stop-color="#204f73"/></linearGradient>
+    <style>
+      text{font-family:Inter,Arial,sans-serif;fill:#15344e} .heading{font-size:66px;font-weight:700;letter-spacing:-2px}.subtitle{font-size:28px;fill:#64748b}.name{font-size:25px;font-weight:700}.detail{font-size:19px;fill:#526780}.category{font-size:13px;font-weight:700;letter-spacing:2px}.line{fill:none;stroke:#42607e;stroke-width:2.5;marker-end:url(#arrow)}.label{font-size:18px;fill:#526780}.card{rx:18;stroke-width:1.5}.icon{fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+    </style>
+  </defs>
+  <rect width="1600" height="900" fill="#fcfdff"/>
+  <text x="60" y="105" class="heading">Kex Lab</text>
+  <text x="60" y="155" class="subtitle">Kafka operations, connected.</text>
+  <text x="1160" y="92" class="category" fill="#64748b">INTEGRATION ARCHITECTURE</text>
+  <g id="flows">
+    <path class="line" d="M250 470H375"/><text x="312" y="450" text-anchor="middle" class="label" style="font-size:16px">Produce events</text>
+    <path class="line" d="M655 430V325Q655 305 675 305H800"/><text x="648" y="279" class="label">Kafka evidence</text>
+    <path class="line" d="M655 530V655Q655 675 675 675H800"/><text x="605" y="714" class="label">Consumer workload</text>
+    <path class="line" d="M1250 305H1160"/><text x="1205" y="252" text-anchor="middle" class="label" style="font-size:16px">Read-only</text><text x="1205" y="278" text-anchor="middle" class="label" style="font-size:16px">MCP tools</text>
+    <path class="line" stroke-dasharray="8 8" d="M1390 590V410"/><text x="1406" y="493" class="label">Optional</text><text x="1406" y="520" class="label">integration</text>
+  </g>
+  <g id="traffic">
+    <rect x="45" y="370" width="205" height="205" class="card" rx="18" fill="#f6f8fb" stroke="#d3dce8"/>
+    <g transform="translate(79 402)" class="icon" color="#64748b"><rect width="28" height="35" rx="3"/><path d="M6 9H22M6 17H22M6 25H18"/></g>
+    <text x="75" y="478" class="name">Demo traffic</text><text x="75" y="515" class="detail">Sample events</text><text x="75" y="542" class="detail">for evaluation</text>
+  </g>
+  <g id="kafka">
+    <rect x="375" y="375" width="310" height="205" class="card" rx="18" fill="url(#navy)" stroke="#15344e"/>
+    <g transform="translate(491 403)" class="icon" color="#fff"><ellipse cx="38" cy="12" rx="38" ry="12"/><path d="M0 12V58C0 75 76 75 76 58V12M0 35C0 52 76 52 76 35"/></g>
+    <text x="415" y="520" class="name" style="fill:#fff;font-size:32px">Apache Kafka</text><text x="412" y="553" class="detail" style="fill:#c0d2e3">Shared event backbone</text>
+  </g>
+  <g id="explorer">
+    <rect x="800" y="220" width="360" height="190" class="card" rx="18" fill="#f1fcf9" stroke="#9bdbd2"/>
+    <text x="830" y="257" class="category" style="fill:#078b7f">OBSERVE</text>
+    <text x="830" y="303" class="name">Kafka SQL Explorer</text><text x="830" y="346" class="detail">Inspect topics, records</text><text x="830" y="374" class="detail">and consumer lag</text>
+  </g>
+  <g id="autotune">
+    <rect x="800" y="590" width="400" height="180" class="card" rx="18" fill="#f0f7ff" stroke="#a8caee"/>
+    <text x="830" y="627" class="category" style="fill:#2475ba">ADAPT</text>
+    <text x="830" y="674" class="name">KafkaConsumerAutoTune</text><text x="830" y="715" class="detail">Consume events and tune</text><text x="830" y="743" class="detail">consumer settings</text>
+  </g>
+  <g id="agent">
+    <rect x="1250" y="220" width="305" height="190" class="card" rx="18" fill="#f6f3ff" stroke="#c5b7f5"/>
+    <text x="1280" y="257" class="category" style="fill:#7051c7">DIAGNOSE</text>
+    <text x="1280" y="303" class="name">Kex-anHarness</text><text x="1280" y="346" class="detail">AI-assisted Kafka</text><text x="1280" y="374" class="detail">diagnosis</text>
+  </g>
+  <g id="spectra">
+    <rect x="1250" y="590" width="305" height="180" class="card" rx="18" fill="#f6f3ff" stroke="#c5b7f5"/>
+    <text x="1280" y="627" class="category" style="fill:#7051c7">KNOWLEDGE · OPTIONAL</text>
+    <text x="1280" y="674" class="name">SpectraLLM</text><text x="1280" y="715" class="detail">Local inference and</text><text x="1280" y="743" class="detail">private knowledge</text>
+  </g>
+  <path class="line" d="M60 837H125"/><text x="145" y="843" class="label">Core data and tool paths</text>
+  <path class="line" stroke-dasharray="8 8" d="M460 837H525"/><text x="545" y="843" class="label">Optional integration</text>
+  <text x="1010" y="843" class="category" style="font-size:11px">PUBLISHED IMAGES · SHARED KAFKA · OBSERVABLE EVIDENCE</text>
+</svg>

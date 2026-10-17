@@ -4,7 +4,14 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 
 ## Unreleased
 
+## 0.1.0 — 2026-10-17
+
 ### Added
+- Provisioned integrated Grafana dashboard, authenticated Agent metrics scrape and an internal, pinned Python-standard-library adapter for measured AutoTune lag.
+- Editable SVG/Mermaid architecture overviews alongside the original PNG.
+- `make demo-lite` runs the guided four-service demo without Spectra model downloads and records its evidence.
+- Timestamped scenario evidence and Markdown/JSON reports with actual runtime image identities, registry digests, interface links and fail-visible status.
+- Versioned, exact-commit release bundles with checksums and a main/tag/checks-gated publication workflow for 0.1.0.
 - Shared architecture graphic in the README, architecture guide and end-to-end walkthrough, with descriptive alternative text and explicit optional-integration boundaries.
 - `make check` runs repository tests, shell syntax, source links and six Compose profile validations through the same entry point in CI.
 - Profile-aware health, smoke and readiness checks with nonzero exit status for missing or unhealthy expected services.

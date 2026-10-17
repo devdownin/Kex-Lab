@@ -46,7 +46,8 @@ class ImagePinsTest(unittest.TestCase):
                         if line and not line.startswith('#'))
         for key, compose in [('AUTOTUNE_IMAGE', 'compose.autotune.yml'),
                              ('SPECTRALLM_IMAGE', 'compose.hub.yml'),
-                             ('SPECTRALLM_FRONTEND_IMAGE', 'compose.hub.yml')]:
+                             ('SPECTRALLM_FRONTEND_IMAGE', 'compose.hub.yml'),
+                             ('LAG_EXPORTER_IMAGE', 'compose.observability.yml')]:
             image = manifest[key]
             self.assertRegex(image, r'^[\w./-]+@sha256:[a-f0-9]{64}$')
             self.assertIn('${' + key + ':-' + image + '}', (root / compose).read_text())

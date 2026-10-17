@@ -2,45 +2,46 @@ name: Release Kex Lab
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    tags: ["v*.*.*"]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-
-      - name: Validate compatibility manifest
+        with:
+          fetch-depth: 0
+      - name: Verify reviewed main history and version
         run: |
-          test -s versions.env
-          grep -q '^KEX_LAB_MANIFEST_VERSION=' versions.env
-          grep -q '^EXPLORER_IMAGE=' versions.env
-          grep -q '^KEX_AGENT_IMAGE=' versions.env
-          grep -q '^AUTOTUNE_IMAGE=' versions.env
-          grep -q '^SPECTRALLM_IMAGE=' versions.env
-          grep -q '^SPECTRALLM_FRONTEND_IMAGE=' versions.env
-
-      - name: Build release notes
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            test "$GITHUB_REF_NAME" = "v$(cat VERSION)"
+          fi
+      - name: Validate repository
+        run: make check
+      - name: Validate Kafka integration
+        run: make integration-smoke
+      - name: Validate observability
+        run: make observability-smoke
+      - name: Build exact-commit release assets
         run: |
-          {
-            echo "## Kex Lab compatibility bundle"
-            echo
-            echo 'The exact image references validated for this Lab release are:'
-            echo
-            echo '~~~text'
-            cat versions.env
-            echo '~~~'
-            echo
-            echo "See CHANGELOG.md for Lab-level changes and each component repository for component-specific changes."
-          } > release-notes.md
-
-      - name: Create GitHub release
+          python3 scripts/prepare-release.py --output dist
+          (cd dist && sha256sum -c SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kex-lab-release-bundle
+          path: dist/
+      - name: Publish tagged release
         if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" --title "Kex Lab ${GITHUB_REF_NAME}" --notes-file release-notes.md
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "Kex Lab $GITHUB_REF_NAME" --notes-file dist/release-notes.md dist/kex-lab-*.tar.gz dist/versions.env dist/bundle.json dist/SHA256SUMS
