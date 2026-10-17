@@ -1,8 +1,13 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-cd "$ROOT"
 SCENARIO="${1:-basic}"
+case "$SCENARIO" in
+  basic|dlt) export KEX_LAB_MESSAGES="${KEX_LAB_MESSAGES:-500}" ;;
+  lag) export KEX_LAB_MESSAGES="${KEX_LAB_MESSAGES:-10000}" ;;
+  overload) export KEX_LAB_MESSAGES="${KEX_LAB_MESSAGES:-50000}" ;;
+  *) echo "Unsupported scenario: $SCENARIO" >&2; exit 2 ;;
+esac
+. "$(dirname -- "$0")/common.sh"
 sh scripts/scenario.sh "$SCENARIO"
 
 COMPOSE="docker compose --env-file versions.env -f compose.yml -f compose.autotune.yml"
@@ -10,12 +15,12 @@ TOPIC="${KEX_LAB_TOPIC:-demo.app.topic}"
 
 count="$($COMPOSE exec -T kafka /opt/kafka/bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic "$TOPIC" 2>/dev/null | awk -F: '{sum += $3} END {print sum+0}')"
 case "$SCENARIO" in
-  basic) min=500 ;;
-  lag) min=10000 ;;
-  overload) min=50000 ;;
-  dlt) min=501 ;;
+  basic|dlt) min="${KEX_LAB_MESSAGES:-500}" ;;
+  lag) min="${KEX_LAB_MESSAGES:-10000}" ;;
+  overload) min="${KEX_LAB_MESSAGES:-50000}" ;;
   *) echo "Unsupported scenario: $SCENARIO" >&2; exit 2 ;;
 esac
+[ "$SCENARIO" != dlt ] || min=$((min + 1))
 [ "$count" -ge "$min" ] || { echo "ASSERT FAILED: $TOPIC has $count records, expected >= $min" >&2; exit 1; }
 echo "ASSERT PASS: $SCENARIO produced $count records in $TOPIC (>= $min)."
 

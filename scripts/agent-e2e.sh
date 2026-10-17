@@ -1,8 +1,6 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-cd "$ROOT"
-[ -f .env ] && set -a && . ./.env && set +a
+. "$(dirname -- "$0")/common.sh"
 
 : "${KEX_AGENT_API_KEY:?KEX_AGENT_API_KEY is required}"
 AGENT_URL="${KEX_AGENT_URL:-http://127.0.0.1:${KEX_AGENT_PORT:-8081}}"

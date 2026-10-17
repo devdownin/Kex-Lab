@@ -63,10 +63,13 @@ The `traffic` service uses the same `scripts/kafka-init.sh` implementation as Co
 SpectraLLM remains optional because its first boot downloads several GB of model weights. It is complementary in two roles already supported by the upstream projects: private/local LLM inference and private domain knowledge/RAG. Run it with:
 
 ```bash
-./scripts/evaluate.sh spectra
+sh scripts/evaluate.sh spectra
 ```
 
-It is intentionally not a hard dependency of the traffic-to-diagnosis path. This keeps `make demo` suitable for a normal Docker workstation and makes the additional private-AI layer an explicit evaluation choice.
+`make demo` starts the full published stack, including SpectraLLM. For the
+traffic-to-diagnosis path without Spectra, use `make demo-basic`, then `make wait`.
+The separate upstream evaluation command above uses its own infrastructure;
+stop the Lab first to avoid port collisions.
 
 ## Stop
 

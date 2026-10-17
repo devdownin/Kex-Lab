@@ -1,13 +1,12 @@
 #!/usr/bin/env sh
 set -eu
-ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
-cd "$ROOT"
+. "$(dirname -- "$0")/common.sh"
 
 sh scripts/doctor.sh
 sh scripts/hub.sh up
 
 echo "Waiting for the Kex Lab services..."
-sh scripts/wait-ready.sh || true
+sh scripts/wait-ready.sh
 
 echo "Injecting the reproducible basic Kafka scenario..."
 sh scripts/scenario.sh basic

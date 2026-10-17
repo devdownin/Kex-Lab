@@ -47,7 +47,7 @@ Kex Lab is an integration and evaluation repository. The four products remain in
 
 > **Goal:** get the published Kex applications running together around a shared Kafka broker.
 
-**Requirement:** Docker Engine with Compose v2.
+**Requirements:** Docker Engine with Compose v2, Make, a POSIX shell and curl. Python 3 is needed for local contract tests and Agent end-to-end assertions.
 
 ### Complete stack · Docker images
 
@@ -68,6 +68,34 @@ Open:
 SpectraLLM still needs its model artifacts. With `SPECTRA_STARTUP_AUTO_INSTALL_MODELS=true`, its API may download the default models on first startup. Kex-anHarness chat requires a configured model provider/API key.
 
 Kafka initialization is part of the Compose lifecycle: the one-shot `kafka-init` service waits for Kafka, creates the configured application and DLT topics, then seeds the application topic before dependent services start. `make demo` checks prerequisites, starts the published stack, waits for readiness, runs the basic scenario, prints the health dashboard and the application URLs. Stop the complete stack with `make hub-down`.
+
+### Configuration and checks
+
+Run commands from the repository root. `make setup` creates `.env` if missing;
+review it before starting services. `versions.env` supplies image defaults,
+`.env` supplies local settings, and exported shell variables override both.
+For example, `KEX_LAB_MESSAGES=5000 make traffic` adds 5,000 records to the
+configured `KEX_LAB_TOPIC`. The traffic service also uses `KEX_LAB_DLT_TOPIC`
+and `KEX_LAB_PARTITIONS` when creating topics.
+
+Scenario defaults are 500 records for `basic` and `dlt`, 10,000 for `lag`,
+and 50,000 for `overload`; an exported `KEX_LAB_MESSAGES` overrides these.
+The DLT scenario adds one poison record to the source topic. Scenario assertions
+check the resulting topic's total offsets, including earlier runs; they do not
+prove a per-run increase or automatic DLT forwarding.
+
+```bash
+make setup
+make wait        # Requires a running core stack; fails if it never becomes ready
+python3 -m unittest discover -s tests -v
+python3 scripts/check-repository-links.py
+```
+
+`make demo` stops if core readiness fails. `make health` displays HTTP reachability
+and container status; use `make smoke` for a failing core health check.
+Use `make down` for the core stack, `make hub-down` for the full stack, or
+`make observability-down` for the observability profile. `make reset` removes
+core Kafka and operational-review volumes, including their stored data.
 
 ### 🌱 Kafka initialization
 
@@ -188,7 +216,7 @@ make health
 make observability-up
 # Prometheus: http://localhost:9090
 # Grafana:    http://localhost:3000
-# Dashboard:  Kex Lab / Kex Lab — Integrated Operations
+# Grafana includes a provisioned Prometheus datasource; create or import dashboards as needed.
 ```
 
 Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/OPERATIONAL-REVIEWS.md](docs/OPERATIONAL-REVIEWS.md) for the new MCP reviews, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.

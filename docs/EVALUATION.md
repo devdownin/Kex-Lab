@@ -7,7 +7,7 @@ The goal is to get useful evidence quickly, then deepen only the component you n
 1. Copy configuration: `cp .env.example .env`.
 2. Replace the two development tokens in `.env`.
 3. Run `make up`.
-4. Run `make smoke`.
+4. Run `make wait`, then `make smoke`.
 5. Open Explorer on http://localhost:8080 and Kex-anHarness on http://localhost:8081.
 6. In Explorer, verify the broker is reachable and inspect topics.
 7. If an LLM key is configured, ask Kex-anHarness to list Kafka topics. The useful evidence is not only the answer: verify that the conversation reports an MCP tool call.
@@ -33,7 +33,7 @@ malformed source record does not demonstrate that it was forwarded.
 
 ```bash
 make components
-./scripts/evaluate.sh explorer
+sh scripts/evaluate.sh explorer
 ```
 
 Use the upstream seeded sandbox to evaluate topic browsing, SQL, schema inference, stream tracing, data model and cluster audit. This scenario is richer than the minimal Lab broker and remains maintained by the Explorer project.
@@ -42,7 +42,7 @@ Use the upstream seeded sandbox to evaluate topic browsing, SQL, schema inferenc
 
 ```bash
 make components
-./scripts/evaluate.sh autotune
+sh scripts/evaluate.sh autotune
 ```
 
 The upstream stack starts Kafka, Oracle XE and its observability services. Evaluate:
@@ -60,7 +60,7 @@ This stack uses its own ports and Kafka. Stop the core Lab first with `make down
 
 ```bash
 make components
-./scripts/evaluate.sh spectra
+sh scripts/evaluate.sh spectra
 ```
 
 The script delegates to Spectra's maintained `start.sh --first-run --hub` path. The first run downloads model weights and is intentionally not part of the five-minute core path.
@@ -89,3 +89,13 @@ The target demonstration is an observable business flow in Kafka where:
 6. every automated conclusion can be traced back to observations.
 
 That scenario should be added incrementally using stable APIs rather than coupling the four codebases.
+
+## Repository checks
+
+Run `python3 -m unittest discover -s tests -v` for shell-entry-point regression
+checks and the TimesFM HTTP contracts. These tests do not start containers or
+call a model provider. Run `python3 scripts/check-repository-links.py` and
+`for script in scripts/*.sh; do sh -n "$script" || exit; done` for source checks.
+CI additionally validates the Compose profiles. `make integration-smoke` starts
+the real core and AutoTune services, injects traffic, checks health, then removes
+the stack and its volumes; run it only against a disposable Lab.
