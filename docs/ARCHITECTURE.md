@@ -6,6 +6,16 @@ Kex Lab is an integration boundary, not a monorepo. Each product remains indepen
 
 ## Runtime topology
 
+![Kex Lab architecture: demo traffic enters Apache Kafka; Explorer inspects Kafka evidence; AutoTune consumes traffic; Kex-anHarness calls Explorer through read-only MCP tools; SpectraLLM provides optional local inference and knowledge.](assets/kex-lab-architecture.png)
+
+Solid arrows show the core event and tool paths. The dashed SpectraLLM link
+represents an optional integration, not an automatically configured dependency.
+The detailed topology below also includes initialization, the Spectra frontend,
+its API and ChromaDB.
+
+<details>
+<summary>Detailed Compose topology</summary>
+
 ```mermaid
 flowchart TD
     K[(Kafka 4.3)] --> I[kafka-init one-shot]
@@ -19,6 +29,8 @@ flowchart TD
     S --> C[(ChromaDB)]
     S -. optional Kafka ingestion .-> K
 ```
+
+</details>
 
 | Boundary | Contract |
 |---|---|

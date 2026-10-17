@@ -28,14 +28,7 @@
 
 Kex Lab connects four open-source projects around one Kafka broker so developers and platform teams can evaluate Kafka inspection, adaptive consumption, AI-assisted diagnosis and optional local AI capabilities in one reproducible environment.
 
-```mermaid
-flowchart LR
-  P[Produce Kafka traffic] --> K[(Kafka)]
-  K --> T[KafkaConsumerAutoTune]
-  K --> E[Kafka SQL Explorer]
-  E -->|read-only MCP| A[Kex-anHarness]
-  S[SpectraLLM] -. optional local AI / knowledge .-> A
-```
+![Kex Lab architecture: demo traffic enters Apache Kafka; Explorer inspects Kafka evidence; AutoTune consumes traffic; Kex-anHarness calls Explorer through read-only MCP tools; SpectraLLM provides optional local inference and knowledge.](docs/assets/kex-lab-architecture.png)
 
 ### From events to insights
 
@@ -208,17 +201,11 @@ Stop with `make down`, or use `make reset` to also remove volumes.
 
 ## 🏗️ How it connects
 
-```mermaid
-flowchart TD
-  I["kafka-init"] -->|create topics and seed records| K[("Kafka 4.3")]
-  K -->|topics and records| E["Kafka SQL Explorer"]
-  K -->|consumer workload| T["KafkaConsumerAutoTune"]
-  T -. consumer state and metrics .-> K
-  A["Kex-anHarness"] -->|read-only MCP calls| E
-  E -->|Kafka evidence| A
-  A -. optional local inference .-> S["SpectraLLM"]
-  S -. optional Kafka ingestion .-> K
-```
+The [architecture diagram](docs/assets/kex-lab-architecture.png) summarizes the
+core data and tool paths. Solid arrows show event flow and MCP tool calls;
+the dashed SpectraLLM connection represents an optional integration that must
+be configured explicitly. The `kafka-init` service creates topics and seeds
+records before dependent applications start.
 
 **Runtime boundaries:** Kafka is the shared event backbone; Explorer owns inspection and the read-only MCP evidence boundary; AutoTune consumes Kafka traffic and adapts its consumer settings; Kex-anHarness reasons over governed MCP evidence rather than receiving Kafka mutation rights; Spectra is optional local inference/knowledge infrastructure. See [the detailed architecture](docs/ARCHITECTURE.md).
 

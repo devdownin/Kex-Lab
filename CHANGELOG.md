@@ -5,6 +5,7 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 ## Unreleased
 
 ### Added
+- Shared architecture graphic in the README, architecture guide and end-to-end walkthrough, with descriptive alternative text and explicit optional-integration boundaries.
 - `make check` runs repository tests, shell syntax, source links and six Compose profile validations through the same entry point in CI.
 - Profile-aware health, smoke and readiness checks with nonzero exit status for missing or unhealthy expected services.
 - Unique integration-test Compose projects with ephemeral loopback ports and cleanup restricted to their own resources.

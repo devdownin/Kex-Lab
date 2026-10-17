@@ -2,20 +2,11 @@
 
 This scenario demonstrates the operational chain shared by three of the four projects without duplicating their source trees.
 
-```text
-traffic generator
-       |
-       v
-    Kafka 4.3 <--------- KafkaConsumerAutoTune
-       |
-       v
-Kafka SQL Explorer --MCP--> Kex-anHarness
-       ^
-       |
- optional private AI / knowledge
-       |
-   SpectraLLM
-```
+![Kex Lab architecture: demo traffic enters Apache Kafka; Explorer inspects Kafka evidence; AutoTune consumes traffic; Kex-anHarness calls Explorer through read-only MCP tools; SpectraLLM provides optional local inference and knowledge.](assets/kex-lab-architecture.png)
+
+Traffic flows into Kafka, AutoTune consumes it, and Explorer exposes the broker
+as read-only MCP evidence for Kex-anHarness. The dashed SpectraLLM path is an
+optional integration requiring explicit configuration.
 
 ## Run
 
