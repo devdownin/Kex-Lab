@@ -29,6 +29,18 @@ Compose first runs the one-shot `kafka-init` service. It creates `demo.app.topic
 
 AutoTune is launched with its `dev` profile and H2 persistence, so the Lab does not require the Oracle XE stack merely to demonstrate Kafka consumption and tuning. Its image normally waits for Oracle in its entrypoint; the Lab overrides that entrypoint for this H2 evaluation profile.
 
+## Verify each injection
+
+`SCENARIO=basic make scenario-assert` captures offsets before and after one
+traffic run and requires exactly the configured number of new records across
+all partitions. `SCENARIO=dlt make scenario-assert` additionally finds a poison
+record among the newly appended records. Existing backlog or historical poison
+records cannot satisfy these checks. Run with no other producer writing to the
+same topic; concurrent writes fail the exact-count assertion.
+
+Use `make health PROFILE=demo` to check this Kafka/Explorer/Agent/AutoTune stack.
+Use `make health PROFILE=full` when Spectra is also running.
+
 ## Observe
 
 Open:

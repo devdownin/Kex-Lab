@@ -1,6 +1,6 @@
 services:
   autotune:
-    image: ${AUTOTUNE_IMAGE:-compagnonsdudev/kafkaconsumerautotune:latest}
+    image: ${AUTOTUNE_IMAGE:-compagnonsdudev/kafkaconsumerautotune@sha256:0491a7315834c30bb00f69c303847d7bde0725ab44a8301ec67fb9c6f1557d17}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${AUTOTUNE_PORT:-8082}:8080"
     environment:

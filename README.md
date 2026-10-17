@@ -47,7 +47,7 @@ Kex Lab is an integration and evaluation repository. The four products remain in
 
 > **Goal:** get the published Kex applications running together around a shared Kafka broker.
 
-**Requirements:** Docker Engine with Compose v2, Make, a POSIX shell and curl. Python 3 is needed for local contract tests and Agent end-to-end assertions.
+**Requirements:** Docker Engine with Compose v2, Make, a POSIX shell and curl. Python 3 is needed for repository checks, scenario assertions and Agent end-to-end assertions.
 
 ### Complete stack · Docker images
 
@@ -81,18 +81,30 @@ and `KEX_LAB_PARTITIONS` when creating topics.
 Scenario defaults are 500 records for `basic` and `dlt`, 10,000 for `lag`,
 and 50,000 for `overload`; an exported `KEX_LAB_MESSAGES` overrides these.
 The DLT scenario adds one poison record to the source topic. Scenario assertions
-check the resulting topic's total offsets, including earlier runs; they do not
-prove a per-run increase or automatic DLT forwarding.
+initialize topics without seed traffic, capture every partition's offsets, inject
+traffic once, and require an exact increase of the requested count (plus one for
+DLT). The DLT check reads only newly appended ranges. Concurrent producers,
+partition changes or offset rewinds make the assertion fail; automatic DLT
+forwarding remains outside this check.
 
 ```bash
 make setup
 make wait        # Requires a running core stack; fails if it never becomes ready
-python3 -m unittest discover -s tests -v
-python3 scripts/check-repository-links.py
+make check       # Tests, shell syntax, source links and all six Compose profiles
 ```
 
-`make demo` stops if core readiness fails. `make health` displays HTTP reachability
-and container status; use `make smoke` for a failing core health check.
+`make check` needs Python 3 and Compose v2, starts no containers and uses
+`.env.example` instead of your private `.env` for Compose validation.
+
+`make health`, `make smoke` and `make wait` accept `PROFILE=core|ai|reviews|demo|full|observability`
+(default: `ai`, matching `make up`). For example, `make health PROFILE=core` checks
+Kafka and Explorer without requiring the Agent. Checks fail with exit code 1 if
+an expected container is missing/unhealthy or its HTTP/broker probe fails;
+unknown profiles return 2. `demo` adds AutoTune, `full` adds Spectra, and
+`observability` adds Prometheus/Grafana. Chroma is checked through its container
+state/health when present; model installation and a successful LLM inference
+are separate checks. `make demo` stops on core readiness failure and finishes
+with a full-profile health check.
 Use `make down` for the core stack, `make hub-down` for the full stack, or
 `make observability-down` for the observability profile. `make reset` removes
 core Kafka and operational-review volumes, including their stored data.
@@ -162,7 +174,14 @@ make report
 | Run the complete published stack | `make profile-full` | Kafka + Explorer + Agent + AutoTune + Spectra |
 | Run the guided scenario | `make profile-demo` | Full stack + readiness + traffic + health view |
 
-The compatible image set is centralized in `versions.env`, which acts as the Lab compatibility manifest.
+The compatible image set is centralized in `versions.env`, which acts as the Lab
+compatibility manifest. AutoTune and both Spectra images use immutable registry
+digests, also used as Compose defaults. Their digests were resolved from the
+published `latest` references on 2026-10-17. To update them, inspect the intended
+release with `docker buildx imagetools inspect <image>:<tag>`, update both the
+manifest and the Compose fallback, then run `make check` and the integration
+smoke test. AutoTune's pinned index currently contains `linux/amd64`; Spectra's
+indices contain both `linux/amd64` and `linux/arm64`.
 
 ### 📦 Prefer a smaller starting point?
 
@@ -210,8 +229,8 @@ Individual products can also be evaluated from their upstream repositories. `mak
 For the integrated Lab, optional cross-project observability is available with:
 
 ```bash
-make health
-# Service state, image/version and URL
+make health PROFILE=demo
+# Containers, Kafka, Explorer, Agent and AutoTune readiness
 
 make observability-up
 # Prometheus: http://localhost:9090
@@ -272,3 +291,13 @@ Existing `.components/Kex-agent-ai` checkouts are moved to `.components/Kex-anHa
 by `make components`, preserving local files and Git history. If both directories
 already exist, both are kept and the new one is used. The agent remote is updated
 to the new URL before the normal fast-forward-only update.
+
+### Isolated integration smoke test
+
+`make integration-smoke` creates a unique `kex-lab-test-*` Compose project, uses
+loopback ports assigned by Docker, and checks basic and DLT traffic increases.
+It ignores an inherited `COMPOSE_PROJECT_NAME` and port settings for isolation.
+On success, failure or a handled signal, it removes only that test project's
+containers, network and volumes. Logs are printed before cleanup on failure.
+A forced kill or machine crash can leave test resources behind; inspect their
+project label before cleanup. The normal Lab project and volumes are preserved.

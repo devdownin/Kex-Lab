@@ -92,10 +92,21 @@ That scenario should be added incrementally using stable APIs rather than coupli
 
 ## Repository checks
 
-Run `python3 -m unittest discover -s tests -v` for shell-entry-point regression
-checks and the TimesFM HTTP contracts. These tests do not start containers or
-call a model provider. Run `python3 scripts/check-repository-links.py` and
-`for script in scripts/*.sh; do sh -n "$script" || exit; done` for source checks.
-CI additionally validates the Compose profiles. `make integration-smoke` starts
-the real core and AutoTune services, injects traffic, checks health, then removes
-the stack and its volumes; run it only against a disposable Lab.
+Run `make check` for the shell-entry-point and TimesFM HTTP contracts, strict
+Kafka offset checks, immutable image-pin consistency, shell syntax, source
+links and all six Compose profiles. It starts no containers and validates using
+`.env.example` rather than the local `.env`. Docker Engine is required for the
+separate runtime checks, not for `docker compose config`.
+
+Use `make health PROFILE=core` for Kafka/Explorer, `PROFILE=ai` for the Agent,
+`PROFILE=reviews` for operational reviews, `PROFILE=demo` for AutoTune,
+`PROFILE=full` for Spectra, and `PROFILE=observability` for Prometheus/Grafana.
+The same selector works with `make smoke` and `make wait`. A missing or unhealthy
+expected service fails the command; optional services outside the chosen profile
+are not probed. HTTP health does not establish successful model inference.
+
+`make integration-smoke` starts real core and AutoTune services in a unique
+Compose project with ephemeral loopback ports. It verifies exact offset increases
+for basic and DLT traffic and checks the poison record only in newly appended
+ranges. It prints logs on failure and removes only its own resources on exit.
+A normal Lab can remain running alongside this test.

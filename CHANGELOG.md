@@ -5,6 +5,11 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 ## Unreleased
 
 ### Added
+- `make check` runs repository tests, shell syntax, source links and six Compose profile validations through the same entry point in CI.
+- Profile-aware health, smoke and readiness checks with nonzero exit status for missing or unhealthy expected services.
+- Unique integration-test Compose projects with ephemeral loopback ports and cleanup restricted to their own resources.
+- Exact per-run, per-partition offset assertions and DLT checks restricted to newly produced records.
+- Immutable Docker Hub index digests for AutoTune and both Spectra images, resolved on 2026-10-17 and shared with Compose fallbacks.
 - One-command `make demo` journey using published Docker Hub images.
 - Usage profiles for core, AI, full-stack and guided demo paths.
 - Lab health dashboard and reproducible operational scenario catalog.
@@ -14,6 +19,7 @@ All notable changes to Kex Lab are documented here. Kex Lab releases describe th
 - Optional operational review profile for compatible KafkaExplorer and Kex-anHarness images: single-broker `lab` topic policy, declared demo DLT source, and persisted lag baselines. The Agent end-to-end check now uses its current authenticated chat API and checks a real MCP tool invocation.
 
 ### Fixed
+- Probe Explorer liveness directly on loopback so container proxy settings cannot redirect the health check.
 - Preserve exported configuration overrides across Lab scripts; load the image manifest for health and runtime commands.
 - Keep scenario-specific traffic defaults despite the example `.env`, honor custom topic/partition settings, and use custom counts in assertions.
 - Stop the guided demo on readiness failure; allow readiness checks from any working directory and validate retry arguments.
