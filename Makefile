@@ -2,7 +2,7 @@ SHELL := /bin/sh
 .DEFAULT_GOAL := setup
 COMPOSE := docker compose --env-file versions.env --env-file .env -f compose.yml
 
-.PHONY: check setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-reviews profile-full profile-demo integration-smoke scenario-assert agent-e2e
+.PHONY: observability-smoke demo-lite demo-lite-down release-prepare check setup up down reset status smoke logs components evaluate demo demo-down traffic doctor report wait observability-up observability-down demo-basic demo-lag demo-dlt demo-overload hub-pull hub-up hub-down hub-status health profile-core profile-ai profile-reviews profile-full profile-demo integration-smoke scenario-assert agent-e2e
 
 check:
 	sh scripts/check.sh
@@ -35,6 +35,15 @@ components:
 evaluate:
 	sh scripts/evaluate.sh all
 
+demo-lite: setup
+	sh scripts/demo-lite.sh
+
+demo-lite-down:
+	$(COMPOSE) -f compose.autotune.yml down
+
+release-prepare:
+	python3 scripts/prepare-release.py
+
 demo: setup
 	sh scripts/quick-demo.sh
 
@@ -51,7 +60,7 @@ wait:
 	KEX_LAB_HEALTH_PROFILE=$(or $(PROFILE),ai) sh scripts/wait-ready.sh
 
 report:
-	sh scripts/report.sh
+	sh scripts/report.sh $(or $(PROFILE),ai)
 
 health:
 	sh scripts/health.sh $(or $(PROFILE),ai)
@@ -68,11 +77,14 @@ demo-dlt: setup
 demo-overload: setup
 	sh scripts/scenario.sh overload
 
+observability-smoke: setup
+	sh scripts/observability-smoke.sh
+
 observability-up: setup
-	docker compose --env-file versions.env --env-file .env -f compose.yml -f compose.autotune.yml -f compose.observability.yml up -d
+	sh scripts/observability.sh up
 
 observability-down:
-	docker compose --env-file versions.env --env-file .env -f compose.yml -f compose.autotune.yml -f compose.observability.yml down
+	sh scripts/observability.sh down
 
 hub-pull:
 	sh scripts/hub.sh pull

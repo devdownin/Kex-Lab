@@ -21,12 +21,20 @@ if [ "$SCENARIO" = dlt ]; then
   expected=$((expected + 1))
 fi
 
-# Initialize topics without seeding; only the explicit traffic run is measured.
-KEX_LAB_MESSAGES=0 KEX_LAB_INJECT_INVALID=false $COMPOSE up -d kafka explorer agent autotune
 work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
+finish() {
+  status=$?
+  trap - EXIT
+  python3 scripts/lab_report.py record --scenario "$SCENARIO" --topic "$TOPIC" \
+    --expected "$expected" --exit-code "$status" --work "$work" || status=1
+  rm -rf "$work"
+  exit "$status"
+}
+trap finish EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
+# Initialize topics without seeding; only the explicit traffic run is measured.
+KEX_LAB_MESSAGES=0 KEX_LAB_INJECT_INVALID=false $COMPOSE up -d kafka explorer agent autotune
 get_offsets() {
   $COMPOSE exec -T kafka /opt/kafka/bin/kafka-get-offsets.sh \
     --bootstrap-server kafka:29092 --time -1 --topic "$TOPIC"

@@ -16,6 +16,7 @@ services:
     restart: "no"
 
   prometheus:
+    secrets: [kex-agent-metrics-token]
     image: ${PROMETHEUS_IMAGE:-prom/prometheus:v3.5.0}
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${PROMETHEUS_PORT:-9090}:9090"
@@ -34,3 +35,18 @@ services:
       - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on: [prometheus]
     restart: unless-stopped
+
+  lab-metrics:
+    image: ${LAG_EXPORTER_IMAGE:-python@sha256:1b668429b3511ab407d8e00648891631b0b1a4d7e15e3ca70f38ab5b91ad4ab4}
+    entrypoint: ["python", "/opt/kex-lab/lag-exporter.py"]
+    volumes:
+      - ./scripts/lag-exporter.py:/opt/kex-lab/lag-exporter.py:ro
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    depends_on: [autotune]
+    restart: unless-stopped
+
+secrets:
+  kex-agent-metrics-token:
+    environment: KEX_AGENT_API_KEY

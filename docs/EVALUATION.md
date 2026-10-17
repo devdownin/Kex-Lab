@@ -110,3 +110,22 @@ Compose project with ephemeral loopback ports. It verifies exact offset increase
 for basic and DLT traffic and checks the poison record only in newly appended
 ranges. It prints logs on failure and removes only its own resources on exit.
 A normal Lab can remain running alongside this test.
+
+## Guided demo and report
+
+Use `make demo-lite` for Kafka, Explorer, AutoTune and the Agent without Spectra
+or a model download. It asserts the basic injection, waits for readiness and
+writes a report. Start with a Docker allocation of 4 CPUs, 8 GB RAM and 10 GB
+free disk; this is a planning budget, not a performance measurement.
+
+`make report PROFILE=demo` captures actual container image IDs/registry digests,
+current health and interface links. Assertions are recorded independently by
+`make scenario-assert` as timestamped JSON under `reports/assertions/`. A report
+selects the latest assertion per scenario for its project and topic and preserves
+its source commit and dirty-worktree flag. No matching records is `UNMEASURED`,
+not proof of a passing scenario. Markdown and JSON are written even on failure.
+
+Use `make observability-smoke` for an isolated real Grafana/Prometheus test,
+including authenticated Agent scraping and the measured lag adapter. It removes
+only its own containers/volumes and leaves its report under `reports/`.
+See [observability details](OBSERVABILITY.md) and [release preparation](RELEASING.md).

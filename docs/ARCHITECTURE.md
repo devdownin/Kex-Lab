@@ -8,6 +8,11 @@ Kex Lab is an integration boundary, not a monorepo. Each product remains indepen
 
 ![Kex Lab architecture: demo traffic enters Apache Kafka; Explorer inspects Kafka evidence; AutoTune consumes traffic; Kex-anHarness calls Explorer through read-only MCP tools; SpectraLLM provides optional local inference and knowledge.](assets/kex-lab-architecture.png)
 
+Editable companions: [SVG](assets/kex-lab-architecture.svg) and
+[Mermaid source](assets/kex-lab-architecture.mmd). The SVG is a vector overview;
+the original PNG remains the presentation illustration. Edit the SVG text and
+paths directly, or use the Mermaid source to regenerate a semantic overview.
+
 Solid arrows show the core event and tool paths. The dashed SpectraLLM link
 represents an optional integration, not an automatically configured dependency.
 The detailed topology below also includes initialization, the Spectra frontend,

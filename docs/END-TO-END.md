@@ -10,10 +10,11 @@ optional integration requiring explicit configuration.
 
 ## Run
 
-Configure `.env`, including an LLM key if you want the Agent reasoning step, then:
+Run `make setup` and review `.env`, including a provider key if you want the
+Agent reasoning step. The lightweight path starts four services without Spectra:
 
 ```bash
-make demo
+make demo-lite
 ```
 
 Compose first runs the one-shot `kafka-init` service. It creates `demo.app.topic` and `demo.app.topic.dlt` (six partitions by default) and seeds `demo.app.topic` with 500 deterministic JSON records by default. Kafka-dependent services then start after successful initialization. Values can be changed through `KEX_LAB_TOPIC`, `KEX_LAB_DLT_TOPIC`, `KEX_LAB_PARTITIONS` and `KEX_LAB_MESSAGES`.
@@ -31,6 +32,11 @@ same topic; concurrent writes fail the exact-count assertion.
 
 Use `make health PROFILE=demo` to check this Kafka/Explorer/Agent/AutoTune stack.
 Use `make health PROFILE=full` when Spectra is also running.
+
+The guided lightweight command records the basic scenario assertion and writes
+`reports/latest.md` and `reports/latest.json`. A starting Docker budget is
+4 CPUs, 8 GB RAM and 10 GB free disk; actual resource use depends on traffic and
+host configuration. Use `make demo` for the full published stack with Spectra.
 
 ## Observe
 

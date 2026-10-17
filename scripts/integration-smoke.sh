@@ -31,4 +31,6 @@ KEX_LAB_HEALTH_PROFILE=demo sh scripts/wait-ready.sh
 KEX_LAB_MESSAGES=25 sh scripts/scenario-assert.sh basic
 KEX_LAB_MESSAGES=3 sh scripts/scenario-assert.sh dlt
 
+sh scripts/report.sh demo
+
 echo "Integrated smoke passed: isolated stack healthy; exact basic and DLT offset increases verified."

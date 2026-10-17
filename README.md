@@ -30,6 +30,9 @@ Kex Lab connects four open-source projects around one Kafka broker so developers
 
 ![Kex Lab architecture: demo traffic enters Apache Kafka; Explorer inspects Kafka evidence; AutoTune consumes traffic; Kex-anHarness calls Explorer through read-only MCP tools; SpectraLLM provides optional local inference and knowledge.](docs/assets/kex-lab-architecture.png)
 
+Editable companions: [SVG](docs/assets/kex-lab-architecture.svg) ·
+[Mermaid source](docs/assets/kex-lab-architecture.mmd).
+
 ### From events to insights
 
 The integrated demo produces Kafka traffic, lets **KafkaConsumerAutoTune** consume and adapt, exposes the broker through **Kafka SQL Explorer**, and gives **Kex-anHarness** a read-only MCP path for assisted diagnosis. **SpectraLLM** adds optional local AI and knowledge capabilities.
@@ -41,6 +44,28 @@ Kex Lab is an integration and evaluation repository. The four products remain in
 > **Goal:** get the published Kex applications running together around a shared Kafka broker.
 
 **Requirements:** Docker Engine with Compose v2, Make, a POSIX shell and curl. Python 3 is needed for repository checks, scenario assertions and Agent end-to-end assertions.
+
+### Lightweight guided demo
+
+```bash
+make demo-lite
+```
+
+This starts Kafka, Explorer, AutoTune and the Agent, waits for the `demo` profile,
+verifies one traffic injection and writes `reports/latest.md` plus
+`reports/latest.json`. It requires no Spectra model download. A provider key is
+needed only for an actual Agent reasoning/tool-call evaluation.
+
+As a starting workstation budget, allocate **4 CPUs, 8 GB RAM and 10 GB free
+disk** to Docker; this is a planning recommendation, not a benchmark guarantee.
+Image downloads and startup time depend on the host and network. The full
+Spectra profile needs additional resources for the selected models.
+
+```bash
+make health PROFILE=demo
+make report PROFILE=demo
+make demo-lite-down   # Stop the lightweight stack and preserve Kafka data
+```
 
 ### Complete stack · Docker images
 
@@ -128,7 +153,7 @@ The one-command demo runs the basic scenario. To deliberately create more visibl
 make demo-lag
 make demo-dlt
 make demo-overload
-make report
+make report PROFILE=demo
 ```
 
 Scenario guides are kept under `scenarios/`: `basic`, `consumer-lag`, `invalid-records` and `overload`. Each guide describes what the scenario injects and what to inspect. Run `SCENARIO=lag make scenario-assert` to execute a scenario with machine-checkable assertions. `make agent-e2e` additionally checks an actual Agent → Explorer MCP tool call when a model provider is configured.
@@ -154,7 +179,7 @@ populates the DLT.
 See [the walkthrough and image versions](docs/OPERATIONAL-REVIEWS.md).
 
 ```bash
-make report
+make report PROFILE=demo
 ```
 
 ### 🧭 Choose a deployment profile
@@ -222,16 +247,45 @@ make health PROFILE=demo
 make observability-up
 # Prometheus: http://localhost:9090
 # Grafana:    http://localhost:3000
-# Grafana includes a provisioned Prometheus datasource; create or import dashboards as needed.
+# Dashboard: Kex Lab / Kex Lab — Integrated Operations
+# Direct link: http://localhost:3000/d/kex-lab-operations
 ```
 
 Image versions are centralized in `versions.env`. See [docs/EVALUATION.md](docs/EVALUATION.md) for evaluation paths, [docs/END-TO-END.md](docs/END-TO-END.md) for the traffic-to-diagnosis demo, [docs/OPERATIONAL-REVIEWS.md](docs/OPERATIONAL-REVIEWS.md) for the new MCP reviews, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for architecture, [docs/CONTRACTS.md](docs/CONTRACTS.md) for integration boundaries and [docs/SCORECARD.md](docs/SCORECARD.md) for the evidence checklist.
 
+The dashboard distinguishes scrape availability from application health and
+shows AutoTune traffic, errors/retries, batch duration, JVM usage and measured
+AutoTune consumer lag. Missing counters or failed lag probes stay unavailable;
+they are not replaced with zero. Lag is for AutoTune's consumers, not every Kafka
+group. See [the observability guide](docs/OBSERVABILITY.md).
+
+`make report PROFILE=observability` snapshots the current runtime image IDs and
+registry digests, health probes, interface links and the latest recorded
+assertion per scenario for the same project/topic. Assertions include their
+recording date, source commit and worktree state; reporting does not rerun them.
+The command still writes Markdown/JSON when checks fail and returns nonzero for
+failed health, collection errors or a latest failed assertion. It records no
+application record payloads or configuration credentials.
+
 ## 🏷️ Releases
 
-Kex Lab versions the **integration bundle**, independently from the component release cycles. A tag such as `v1.0.0` identifies a tested Lab configuration; `versions.env` records the component image references included in that bundle.
+Kex Lab versions the **integration bundle**, independently from its component
+release cycles. `VERSION` selects the Lab version (`0.1.0`); `versions.env`
+records component image references.
 
-Pushing a semantic `vX.Y.Z` tag triggers the release workflow, validates the manifest and creates GitHub release notes containing the exact image set. Lab-level changes are tracked in [CHANGELOG.md](CHANGELOG.md).
+```bash
+make check
+make integration-smoke
+make observability-smoke
+make release-prepare  # Requires a clean, committed worktree
+```
+
+Release preparation builds the exact Git commit into `dist/kex-lab-0.1.0.tar.gz`,
+with `bundle.json`, `versions.env`, release notes and `SHA256SUMS`. The archive
+excludes local credentials, reports, component checkouts and model artifacts.
+After the PR is merged, a matching `v0.1.0` tag triggers the release workflow,
+which requires main ancestry and passing checks before publishing.
+See [release instructions](docs/RELEASING.md) and [0.1.0 notes](docs/releases/v0.1.0.md).
 
 ## 🔒 Principles
 

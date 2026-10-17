@@ -13,7 +13,7 @@ case "$profile" in
     services="$services agent autotune"
     case "$profile" in
       full) COMPOSE="$COMPOSE -f compose.hub.yml"; services="$services spectra-chromadb spectra-api spectra-frontend" ;;
-      observability) COMPOSE="$COMPOSE -f compose.observability.yml"; services="$services prometheus grafana" ;;
+      observability) COMPOSE="$COMPOSE -f compose.observability.yml"; services="$services prometheus grafana lab-metrics" ;;
     esac
     ;;
   *) echo "Usage: $0 {core|ai|reviews|demo|full|observability}" >&2; exit 2 ;;
@@ -62,8 +62,8 @@ if [ "$profile" = full ]; then
   check 'Spectra frontend' http_ready "http://127.0.0.1:${SPECTRA_FRONTEND_PORT:-8084}"
 fi
 if [ "$profile" = observability ]; then
-  check 'Prometheus readiness' http_ready "http://127.0.0.1:${PROMETHEUS_PORT:-9090}/-/ready"
-  check 'Grafana health' http_ready "http://127.0.0.1:${GRAFANA_PORT:-3000}/api/health"
+  check 'Prometheus readiness' http_ready "${KEX_LAB_PROMETHEUS_URL:-http://127.0.0.1:${PROMETHEUS_PORT:-9090}}/-/ready"
+  check 'Grafana health' http_ready "${KEX_LAB_GRAFANA_URL:-http://127.0.0.1:${GRAFANA_PORT:-3000}}/api/health"
 fi
 echo "Result: $fail failed check(s)"
 [ "$fail" -eq 0 ]

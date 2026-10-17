@@ -6,6 +6,9 @@ scrape_configs:
     static_configs:
       - targets: ["explorer:8080"]
   - job_name: kex-agent
+    authorization:
+      type: Bearer
+      credentials_file: /run/secrets/kex-agent-metrics-token
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ["agent:8081"]
@@ -13,3 +16,6 @@ scrape_configs:
     metrics_path: /actuator/prometheus
     static_configs:
       - targets: ["autotune:8080"]
+  - job_name: lab-metrics
+    static_configs:
+      - targets: ["lab-metrics:9108"]
